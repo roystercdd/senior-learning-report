@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="生活,思考,代码,博客,摄影" />
+       
+      <meta name="description" content="欢迎光临CDD的个人网站~~~" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>贪心区间问题 |  漂至</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/deadpool.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="漂至" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-贪心区间问题"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  贪心区间问题
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2024/10/05/%E8%B4%AA%E5%BF%83%E5%8C%BA%E9%97%B4%E9%97%AE%E9%A2%98/" class="article-date">
+  <time datetime="2024-10-05T08:33:48.000Z" itemprop="datePublished">2024-10-05</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%88%86%E7%B1%BB/">分类</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">2.9k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">12 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <meta name="referrer" content="no-referrer">
+
+
+
+<h1><span id="贪心区间问题">贪心区间问题</span></h1><!-- toc -->
+
+<ul>
+<li><a href="#1-%E6%9C%80%E5%A4%A7%E4%B8%8D%E7%9B%B8%E4%BA%A4%E5%8C%BA%E9%97%B4%E6%95%B0%E5%8C%BA%E9%97%B4%E9%80%89%E7%82%B9">1. 最大不相交区间数（区间选点）</a></li>
+<li><a href="#2-%E5%8C%BA%E9%97%B4%E5%88%86%E7%BB%84">2. 区间分组</a></li>
+<li><a href="#3-%E5%8C%BA%E9%97%B4%E8%A6%86%E7%9B%96">3. 区间覆盖</a></li>
+<li><a href="#4-%E5%8C%BA%E9%97%B4%E5%90%88%E5%B9%B6">4. 区间合并</a></li>
+</ul>
+<!-- tocstop -->
+
+<span id="more"></span>
+
+
+
+<blockquote>
+<p>以下例题来自于AcWing 906~908</p>
+</blockquote>
+<h2><span id="1-最大不相交区间数区间选点">1. 最大不相交区间数（区间选点）</span></h2><p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240307214934220.png" alt="image-20240307214934220"></p>
+<ul>
+<li>翻译一下题目吧<ol>
+<li>最大不相交区间数：也就是说给定$N$个闭区间，问能从中选出多少个区间使其互不相交（同活动安排问题）</li>
+<li>区间选点：给定 $N$ 个区间，在数轴上选择尽量少的点，使每个区间至少包含一个选出的点（同整数区间问题：找到一个含元素个数最少的集合，使对每一个区间都至少有一个整数属于该集合，输出该集合的元素个数）</li>
+<li>为什么这两个问题其实是同一个问题？观察下方图像，在找不相交区间的时候其实就是把 $N$ 个区间划分成 $M$ 个集合，从这 $M$ 个集合中分别选出一个区间，那么这 $M$ 个集合是一定不相交的，此时 $M$ 就是答案，区间选点中点的个数其实就是集合的个数，只要 $range[i].l&gt;last_r$ 就说明需要新开一个集合了，所以 $ans++$</li>
+</ol>
+</li>
+<li>贪心策略：新建一个结构体存储区间的左端点和右端点，将这$N$个区间按照右端点从小到大排序（因为活动选择<strong>越早结束越好</strong>），遍历所有的区间，如果当前遍历到的区间左端点的值大于了上一个区间的右端点的值，说明此时区间没有重合，则区间个数$+1$</li>
+<li>如果假设选的点都出现在区间的右端点，此时为了让每个区间都至少包含一个交点，就可以作图如下：</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240529204230868.png" alt="image-20240529204230868"></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> LL;</span><br><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  解题思路: 活动安排+最大不相交区间+区间选点 </span></span><br><span class="line"><span class="comment">  1) 用一个变量记录上一个区间右端点,把所有区间依据区间右端点从小到大排序</span></span><br><span class="line"><span class="comment">  2) 如果某个区间的左端点＞上一个区间右端点,则选点数+1,或不相交区间的个数+1</span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span><span class="number">+5</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Range</span> &#123;</span><br><span class="line">	<span class="type">int</span> l; </span><br><span class="line">	<span class="type">int</span> r;</span><br><span class="line">&#125;range[N]; <span class="comment">// 每个区间有左右端点</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 按照右端点从小到大排序</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">cmp</span><span class="params">(Range a,Range b)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> a.r&lt;b.r;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	cin&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">&quot;%d%d&quot;</span>,&amp;range[i].l,&amp;range[i].r);	</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="type">int</span> res=<span class="number">0</span>;</span><br><span class="line">	<span class="type">int</span> front_r=INT_MIN; <span class="comment">// 保证至少有一个集合,即range[i].l一定比初始front_r大 </span></span><br><span class="line">	<span class="built_in">sort</span>(range<span class="number">+1</span>,range<span class="number">+1</span>+n,cmp);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 也可以定义res=1,front_r=(sorted)range[1].r,下面的for循环从i=2开始</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">if</span>(range[i].l&gt;front_r) &#123;</span><br><span class="line">			front_r=range[i].r; <span class="comment">// 更新右端点</span></span><br><span class="line">			res++; <span class="comment">// 点数+1</span></span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">	cout&lt;&lt;res;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>例题：<a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/solution/P1250">P1250 种树 - 洛谷 </a></p>
+</blockquote>
+<ul>
+<li>题目大意：在区间 $[a,b]$ 内至少种 $c$ 棵树，问树最少的个数</li>
+<li>解题思路：<ul>
+<li>即让尽可能多的树同时在多个区间出现，对每个区间先统计已有树的数量，如果不足 $c$ 棵则补差</li>
+<li>为了让树尽可能能被下一个区间用上，补差时应当从末尾补差</li>
+<li>因为每个坐标点只能种一棵树，所以还需要一个状态数组 $st$ 辅助存储</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> LL;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  解题思路: </span></span><br><span class="line"><span class="comment">  1) 要在[a,b]种至少c棵树,树最少,即让尽可能多的树同时在多个区间出现,再对多个区间补差</span></span><br><span class="line"><span class="comment">  2) 在补差的时候一定要补在该区间的尾部,因为这样是最后可能让下一个区间用上的</span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span>+<span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n,m,a[N];</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Range</span>&#123;</span></span><br><span class="line">	<span class="type">int</span> l;</span><br><span class="line">	<span class="type">int</span> r;</span><br><span class="line">	<span class="type">int</span> n; <span class="comment">// 树的个数</span></span><br><span class="line">&#125;range[N];</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> used[N]; <span class="comment">// 判断是否已经有树了(一个点不能种两棵树)</span></span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">cmp</span><span class="params">(Range a,Range b)</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> a.r&lt;b.r; <span class="comment">// 按右端点从小到大排序</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n&gt;&gt;m;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=m;i++) &#123;</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">&quot;%d%d%d&quot;</span>,&amp;range[i].l,&amp;range[i].r,&amp;range[i].n); 	</span><br><span class="line">	&#125;</span><br><span class="line">	sort(range+<span class="number">1</span>,range+<span class="number">1</span>+m,cmp);</span><br><span class="line">	<span class="type">int</span> ans=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=m;i++) &#123;</span><br><span class="line">		<span class="type">int</span> k=<span class="number">0</span>; <span class="comment">// 存储该区间内已有的树的个数</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=range[i].l;j&lt;=range[i].r;j++) <span class="keyword">if</span>(used[j]) k++;</span><br><span class="line">		<span class="comment">// 1) 已满足range[i].n棵树则退出</span></span><br><span class="line">		<span class="keyword">if</span>(k&gt;=range[i].n) <span class="keyword">continue</span>;</span><br><span class="line">		<span class="comment">// 2) 不满足,则需要补差,补差需要从末尾补,最有可能给下一个区间用</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=range[i].r;j&gt;=range[i].l;j--) &#123;</span><br><span class="line">			<span class="keyword">if</span>(!used[j]) &#123;</span><br><span class="line">				used[j]=<span class="literal">true</span>;</span><br><span class="line">				k++;</span><br><span class="line">				ans++; <span class="comment">// 树的数量只在此处增加,即所有的树其实都是从末尾补的</span></span><br><span class="line">				<span class="keyword">if</span>(k==range[i].n) <span class="keyword">break</span>; <span class="comment">// 已够n棵</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;ans;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="2-区间分组">2. 区间分组</span></h2><p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240308190931030.png" alt="image-20240308190931030"></p>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240529205928100.png" alt="image-20240529205928100"></p>
+<ul>
+<li>翻译一下题目，现在有$N$个区间，问最少分多少组，能让这些分组中的所有区间两两之间包括端点都没有交集</li>
+<li>贪心策略：将所有区间按照左端点从小到大排序，从前往后处理每个区间，判断是否能把这个区间放到现有的某个分组中，即判断 $range[i].l \ &gt; \ 某一分组最大右端点$<ol>
+<li>如果存在这样的分组（与某个分组间没有交集），则将区间 $ i $ 放进去，并且更新这个分组的最大右端点（注意，如果与多个分组都有交集则可以放到任意一个分组中，不影响结果，可自行模拟证明）</li>
+<li>如果不存在这样的分组（与每个分组间都有交集），则开一个新组，再把区间 $i$ 放进去</li>
+<li>在判断当前区间是否与某一分组有交集时，只需要与所有分组中最小的分组最大右端点进行比较即可，因为这是最有可能满足 $range[i].l \ &gt; \ 某一分组最大右端点$ 的情况，对于所有分组中最小的分组最大右端点，只需要用一个小根堆来维护即可</li>
+</ol>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> LL;</span><br><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  解题思路: </span></span><br><span class="line"><span class="comment">  1) 先将所有区间按照左端点从小到大排序</span></span><br><span class="line"><span class="comment">  2) 用优先队列维护所有分组的整体右端点的最小值,因为在遍历区间时需要用range[i].l与所有分组的max_r比较,而min(max_r)是最容易比range[i].l小的,即最容易插入该分组中</span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span><span class="number">+5</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Range</span> &#123;</span><br><span class="line">	<span class="type">int</span> l;</span><br><span class="line">	<span class="type">int</span> r;</span><br><span class="line">&#125;range[N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">cmp</span><span class="params">(Range a,Range b)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 按照左端点从小到大排序</span></span><br><span class="line">	<span class="keyword">return</span> a.l&lt;b.l;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="type">int</span> n;</span><br><span class="line">	cin&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="type">int</span> l,r;</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">&quot;%d%d&quot;</span>,&amp;l,&amp;r);</span><br><span class="line">		range[i]=&#123;l,r&#125;;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="built_in">sort</span>(range<span class="number">+1</span>,range<span class="number">+1</span>+n,cmp);</span><br><span class="line">	<span class="comment">// 维护每个分组的最右边界的最小值</span></span><br><span class="line">	priority_queue&lt;<span class="type">int</span>,vector&lt;<span class="type">int</span>&gt;,greater&lt;<span class="type">int</span>&gt;&gt; pq;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 枚举区间</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="comment">// 如果每个分组的最小的max_r都比当前区间左端点大</span></span><br><span class="line">		<span class="comment">// 说明与每个分组中的区间都要产生交集,则不能放入任何分组</span></span><br><span class="line">		<span class="comment">// 此时新开一个分组</span></span><br><span class="line">		<span class="keyword">if</span>(pq.<span class="built_in">empty</span>() || pq.<span class="built_in">top</span>()&gt;=range[i].l) &#123;</span><br><span class="line">			pq.<span class="built_in">push</span>(range[i].r); <span class="comment">// 新开分组,保存右端点</span></span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// 如果无交集,此时可以放进这个分组中</span></span><br><span class="line">			<span class="comment">// 并维护所有分组中最大右端点的最小值</span></span><br><span class="line">			pq.<span class="built_in">pop</span>();</span><br><span class="line">			pq.<span class="built_in">push</span>(range[i].r);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 小根堆的大小就是分组的个数</span></span><br><span class="line">	cout&lt;&lt;pq.<span class="built_in">size</span>()&lt;&lt;endl;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="3-区间覆盖">3. 区间覆盖</span></h2><p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240308203244259.png" alt="image-20240308203244259"></p>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240529211220012.png" alt="image-20240529211220012"></p>
+<ul>
+<li>翻译一下题目，···，这道题没什么可翻译的</li>
+<li>贪心策略：将所有区间按照左端点从小到大排序，从前往后依次枚举每个区间，在所有能覆盖 $start$ 的区间中选择一个右端点最大的区间，然后将 $start$ 更新成为右端点的最大值，继续向后覆盖，如果所有区间都遍历过了但并没有覆盖到 $end$ 的话说明无法完全覆盖，则输出 $-1$</li>
+</ul>
+ <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> LL;</span><br><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  解题思路: 对区间按照左端点从小到大排序,因为每次都要保证覆盖start</span></span><br><span class="line"><span class="comment">  再从满足覆盖start的区间中选出右端点最大的,这样就能保证覆盖线段的区间数最小</span></span><br><span class="line"><span class="comment">  再更新start的值,如果遍历完所有区间能使start&gt;=end,则可覆盖,输出区间数</span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span><span class="number">+5</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Range</span> &#123;</span><br><span class="line">	<span class="type">int</span> l;</span><br><span class="line">	<span class="type">int</span> r;</span><br><span class="line">	<span class="comment">// 重载运算符</span></span><br><span class="line">	<span class="type">bool</span> <span class="keyword">operator</span>&lt;(<span class="type">const</span> Range &amp;W)<span class="type">const</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> l&lt;W.l;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;range[N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="type">int</span> st,en;</span><br><span class="line">	cin&gt;&gt;st&gt;&gt;en;</span><br><span class="line">	<span class="type">int</span> n;</span><br><span class="line">	cin&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="type">int</span> l,r;</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">&quot;%d%d&quot;</span>,&amp;l,&amp;r);</span><br><span class="line">		range[i]=&#123;l,r&#125;;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">sort</span>(range<span class="number">+1</span>,range<span class="number">+1</span>+n);</span><br><span class="line">	</span><br><span class="line">	<span class="type">int</span> cnt=<span class="number">0</span>; <span class="comment">// 统计区间数</span></span><br><span class="line">	<span class="type">bool</span> flag=<span class="literal">false</span>; <span class="comment">// 是否能覆盖完整个区间</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 遍历所有区间</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="comment">// front_r:当前覆盖到的区域</span></span><br><span class="line">		<span class="comment">// j:每次从第i个区间后开始找</span></span><br><span class="line">		<span class="type">int</span> j=i,front_r=INT_MIN;</span><br><span class="line">		<span class="keyword">while</span>(j&lt;=n &amp;&amp; range[j].l&lt;=st) &#123;</span><br><span class="line">			front_r=<span class="built_in">max</span>(front_r,range[j].r); <span class="comment">// 找最大的右端点</span></span><br><span class="line">			j++;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 如果最大的front_r仍小于st,说明线段不可被已有区间覆盖</span></span><br><span class="line">		<span class="keyword">if</span>(front_r&lt;st) <span class="keyword">break</span>;</span><br><span class="line">		<span class="comment">// 如果找得到,区间数+1</span></span><br><span class="line">		cnt++;</span><br><span class="line">		<span class="comment">// 已经完全覆盖线段</span></span><br><span class="line">		<span class="keyword">if</span>(front_r&gt;=en) &#123;</span><br><span class="line">			flag=<span class="literal">true</span>;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 否则更新i和j</span></span><br><span class="line">		st=front_r; <span class="comment">// 迭代st,后面的区间继续和st比</span></span><br><span class="line">		i=j<span class="number">-1</span>; <span class="comment">// 双指针,加速遍历</span></span><br><span class="line">	&#125;	</span><br><span class="line">	<span class="keyword">if</span>(!flag) cnt=<span class="number">-1</span>;</span><br><span class="line">	cout&lt;&lt;cnt;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="4-区间合并">4. 区间合并</span></h2><ul>
+<li>题目最简单的一集，$N$ 个区间，端点重叠也可合并，求合并后的区间数量和左右端点</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> LL;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  解题思路: 区间合并,端点也算重叠,将有重叠的区间合并后输出</span></span><br><span class="line"><span class="comment">  1) 区间按左端点从小到大排序,有重叠则合并更新区间右端点</span></span><br><span class="line"><span class="comment">  2) range数组一个存储合并前的区间,一个存储合并后的区间,最后遍历输出即可</span></span><br><span class="line"><span class="comment">  </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span>+<span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n,a[N];</span><br><span class="line"></span><br><span class="line"><span class="comment">// range:原区间,ans:合并后区间</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Range</span>&#123;</span></span><br><span class="line">	<span class="type">int</span> l;</span><br><span class="line">	<span class="type">int</span> r;</span><br><span class="line">&#125;range[N],ans[N];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 可以直接return a.l&lt;b.l ,如果右端点也从小到大排序则合并次数多了,常数反而大了</span></span><br><span class="line"><span class="type">bool</span> <span class="title function_">cmp</span><span class="params">(Range a,Range b)</span> &#123;</span><br><span class="line">	<span class="keyword">if</span>(a.l!=b.l) <span class="keyword">return</span> a.l&lt;b.l;</span><br><span class="line">	<span class="keyword">return</span> a.r&lt;b.r;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="type">int</span> l,r;</span><br><span class="line">		<span class="built_in">cin</span>&gt;&gt;l&gt;&gt;r;</span><br><span class="line">		range[i]=&#123;l,r&#125;;</span><br><span class="line">	&#125;</span><br><span class="line">	sort(range+<span class="number">1</span>,range+<span class="number">1</span>+n,cmp);</span><br><span class="line">	<span class="comment">// 枚举所有区间进行合并</span></span><br><span class="line">	<span class="type">int</span> cnt=<span class="number">0</span>;</span><br><span class="line">	ans[++cnt]=range[<span class="number">1</span>]; <span class="comment">// 结构体之间等价赋值</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">2</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="comment">// 可合并</span></span><br><span class="line">		<span class="keyword">if</span>(range[i].l&lt;=ans[cnt].r) &#123;</span><br><span class="line">			ans[cnt].r=max(ans[cnt].r,range[i].r); <span class="comment">// 更新右端点</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 不可合并,开新区间</span></span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			ans[++cnt]=range[i];</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;cnt&lt;&lt;<span class="string">&#x27;\n&#x27;</span>; <span class="comment">// 区间个数</span></span><br><span class="line">	<span class="comment">// 输出合并后的区间</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=cnt;i++) &#123;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;ans[i].l&lt;&lt;<span class="string">&#x27; &#x27;</span>&lt;&lt;ans[i].r&lt;&lt;<span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2024/10/05/%E8%B4%AA%E5%BF%83%E5%8C%BA%E9%97%B4%E9%97%AE%E9%A2%98/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E7%AB%9E%E8%B5%9B/" rel="tag">算法竞赛</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%B4%AA%E5%BF%83/" rel="tag">贪心</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2024/10/07/KMP%E7%AE%97%E6%B3%95/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            KMP算法
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2024/10/05/%E6%90%9C%E7%B4%A2%E5%BC%80%E5%85%B3%E9%97%AE%E9%A2%98/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">搜索开关问题</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.staticfile.org/valine/1.4.16/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "92B90kPxtBbndNGuCdYouFEO-gzGzoHsz",
+    app_key: "GnHcvbn2eo3Vvqi6x4X90ogH",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2024
+        <i class="ri-heart-fill heart_icon"></i> John Doe
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-sea-side.svg" alt="漂至"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2106426315&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<!-- hexo injector body_end start --><script data-pjax src="https://unpkg.com/oh-my-live2d"></script><script>const oml2d = OML2D.loadOml2d({dockedPosition:"left",mobileDisplay:true,models:[{"path":"https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json","scale":0.12,"position":[0,0],"stageStyle":{"width":250},"mobileScale":0.08,"mobilePosition":[0,0],"mobileStageStyle":{"width":180}}],parentElement:document.body,primaryColor:"var(--btn-bg)",sayHello:false,tips:{style: {"width":230,"height":120,"left":"calc(50% - 20px)","top":"-100px"},mobileStyle: {"width":180,"height":80,"left":"calc(50% - 30px)","top":"-100px"},idleTips:{interval:15000,message:function(){
+  return axios.get('https://v1.hitokoto.cn?c=i')
+    .then(function (response) {
+      return response.data.hitokoto ;
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+}}});</script><!-- hexo injector body_end end --></body>
+
+</html>

@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="生活,思考,代码,博客,摄影" />
+       
+      <meta name="description" content="欢迎光临CDD的个人网站~~~" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>数位DP |  漂至</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/deadpool.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="漂至" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-数位DP"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  数位DP
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2024/11/07/%E6%95%B0%E4%BD%8DDP/" class="article-date">
+  <time datetime="2024-11-07T15:23:23.000Z" itemprop="datePublished">2024-11-07</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">4.9k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">22 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <meta name="referrer" content="no-referrer">
+
+<h1><span id="数位dp">数位DP</span></h1><!-- toc -->
+
+<ul>
+<li><a href="#0-%E6%A6%82%E8%BF%B0">0. 概述</a></li>
+<li><a href="#1-%E6%95%B0%E5%AD%97%E6%B8%B8%E6%88%8F">1. 数字游戏</a><ul>
+<li><a href="#11-%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81">1.1. 完整代码</a></li>
+<li><a href="#12-%E6%A0%B7%E4%BE%8B%E8%A7%A3%E6%9E%90">1.2. 样例解析</a></li>
+</ul>
+</li>
+<li><a href="#2-windy%E6%95%B0">2. Windy数</a><ul>
+<li><a href="#21-%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81">2.1. 完整代码</a></li>
+<li><a href="#22-%E6%A0%B7%E4%BE%8B%E8%A7%A3%E6%9E%90">2.2. 样例解析</a></li>
+</ul>
+</li>
+<li><a href="#3-%E5%BA%A6%E7%9A%84%E6%95%B0%E9%87%8F">3. 度的数量</a><ul>
+<li><a href="#31-%E7%8A%B6%E6%80%81%E9%A2%84%E5%A4%84%E7%90%86">3.1. 状态预处理</a></li>
+<li><a href="#32-%E7%8A%B6%E6%80%81%E8%BD%AC%E7%A7%BB">3.2. 状态转移</a></li>
+<li><a href="#33-%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81">3.3. 完整代码</a></li>
+<li><a href="#34-%E6%A0%B7%E4%BE%8B%E8%A7%A3%E6%9E%90">3.4. 样例解析</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+
+<span id="more"></span>
+
+
+
+<h2><span id="0-概述">0. 概述</span></h2><ul>
+<li><p>数位$DP$的特点：求某个区间 $[L,R]$，满足某种性质的数的个数</p>
+</li>
+<li><p>数位$DP$的技巧 $1$：类似前缀和的思想，转换为 $[0,R]-[0,L-1]$ 求解</p>
+</li>
+<li><p>数位$DP$的技巧 $2$：从高位到低位填数字，要分类讨论。把整数 $R$ 的每一位取出来，存入数组 $a$，则 $R&#x3D;a_na_{n-1}a_{n-2}…a_1$从高位到低位填数，划分两类：$[0,a_i-1]$ 和 $a_i$，如果 $i$ 位填 $[0,a_i-1]$ 则后面每一位都可以填 $[0,9]$；如果 $i$ 位填 $a_i$，则再讨论下一位，这样就可以保证填的数不超过 $R$</p>
+</li>
+<li><p>若 $R&#x3D;235$，从高位到低位所以先看第一位百位 $a_i&#x3D;2$，此时第一位可以填 $[0,a_i-1]$ 也就是 $[0,1]$，当 $a_i$ 填 $[0,1]$ 时剩下的每一位都可以填 $[0,9]$，故有 $[000,099]$ 和 $[100,199]$，这些数字都小于 $R$；当 $a_i$ 填 $2$ 时，进而开始看十位 $ai&#x3D;3$，此时第二位可以填 $[0,a_i-1]$ 也就是 $[0,2]$，当第二位填 $[0,2]$ 时剩下每一位都能填 $[0,9]$ 故有 $[200,209]$，$[210,219]$，$[220,229]$，当 $a_i$ 填 $3$ 时就要进而讨论最后一位个位 $a_i&#x3D;5$；此时也要分个位 $a_i$ 取 $[0,4]$ 和 $5$，这样就得到了 $&lt;&#x3D;R$ 的数集进行了划分</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240504112310985.png" alt="image-20240504112310985"></p>
+<ul>
+<li>代码模板<ul>
+<li>先对数集从低位到高位做预处理</li>
+<li>再对数据从高位到低位做递推</li>
+</ul>
+</li>
+</ul>
+<h2><span id="1-数字游戏">1. 数字游戏</span></h2><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1fy4y1q79f/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E36 数位DP 数字游戏_bilibili</a><br>题目描述：从左往右各数字呈非下降关系如 $123$,$446$，问给定区间 $[a,b]$ 求区间内不降数的个数</p>
+</blockquote>
+<ul>
+<li>不降数的个数应该与位数和最高位的数字有关</li>
+<li>状态表示：$f[i,j]$ 表示一共有 $i$ 位，且最高位数字为 $j$ 的不降数的个数</li>
+<li>状态转移：$f[i,j]&#x3D;f[i-1,j]+f[i-1,j+1]+f[i-1,j+2]+…+f[i-1,9]$ ，因为最高位固定为 $j$，所以假设第 $i-1$ 位是 $k$，根据不降数的定义 $k&gt;&#x3D;j$，故有 $f[i,j]&#x3D;\sum_{k&#x3D;j}^9\ f[i-1,k]$，一位一位的确定，所以 $f[i]$ 由 $f[i-1]$ 转移过来。举个比较简单的例子，$f[3,5]$ 表示三位数，最高位数字为 $5$，那么它应该是由 $f[2,5]+f[2,6]+…+f[2,9]$ 转移得到的，比如 $f[2,5]$ 就应该是 $f[1,5]+f[1,6]+…+f[1,9]$ 转移得到的</li>
+<li>边界初值：$f[1,i]&#x3D;1\ (i&#x3D;[1,9])$ 只有一位数时不降数为 $1$</li>
+</ul>
+<h3><span id="11-完整代码">1.1. 完整代码</span></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="comment">// a&lt;=b&lt;=2^31-1≈2.1×10^9,所以不超过10位数</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">12</span>; <span class="comment">// 略开大一点,以防万一</span></span><br><span class="line"><span class="type">int</span> a[N]; <span class="comment">// 保存数字的每一位</span></span><br><span class="line"><span class="type">int</span> f[N][N]; <span class="comment">// f[i][j]:一共有i位且最高位数字是j的不降数的个数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 预处理不降数的个数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">init</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;=<span class="number">9</span>;i++) f[<span class="number">1</span>][i]=<span class="number">1</span>; <span class="comment">// 所有1位数,不降数个数为1</span></span><br><span class="line">	<span class="comment">// 1) 枚举位数,刚才计算了一位数,这里从两位数算起走</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">2</span>;i&lt;N;i++) &#123;</span><br><span class="line">		<span class="comment">// 2) 枚举最高位</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;=<span class="number">9</span>;j++) &#123;</span><br><span class="line">			<span class="comment">// 3) 枚举次高位,k&gt;=j,满足不降数的条件</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> k=j;k&lt;=<span class="number">9</span>;k++) &#123;</span><br><span class="line">				<span class="comment">// 累加方案数</span></span><br><span class="line">				f[i][j]+=f[i<span class="number">-1</span>][k];</span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">&quot;f[%d %d]=%d\n&quot;</span>,i,j,f[i][j]);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算[0,n]有多少个不降数,从高位到低位进行枚举统计,时间按复杂度是10</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">dp</span><span class="params">(<span class="type">int</span> n)</span> &#123;</span><br><span class="line">	<span class="keyword">if</span>(!n) <span class="keyword">return</span> <span class="number">1</span>; <span class="comment">// 特判,n=0也是一种不降数,返回1</span></span><br><span class="line">	<span class="type">int</span> cnt=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(n) a[++cnt]=n%<span class="number">10</span>,n/=<span class="number">10</span>; <span class="comment">// 取位运算</span></span><br><span class="line">	<span class="type">int</span> res=<span class="number">0</span>,last=<span class="number">0</span>; <span class="comment">// res:答案,last:保存上一位数字</span></span><br><span class="line">	<span class="comment">// 从高位到低位枚举每个数字</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=cnt;i&gt;=<span class="number">1</span>;i--) &#123;</span><br><span class="line">		<span class="type">int</span> now=a[i]; <span class="comment">// 当前位数字</span></span><br><span class="line">		<span class="comment">// 枚举当前位可以填入的数字,不能小于last,保证填的数不超过传入的数n</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=last;j&lt;now;j++) &#123;</span><br><span class="line">			res+=f[i][j];</span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;当前枚举到第i=%d位, f[%d %d]=%d res=%d\n&quot;</span>,i,i,j,f[i][j],res);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span>(now&lt;last) <span class="keyword">break</span>; <span class="comment">// 比如遇到528,5过后是2,now&lt;last了,就直接break,后面不用算 </span></span><br><span class="line">		last=now; <span class="comment">// 更新上一位的数字</span></span><br><span class="line">		<span class="keyword">if</span>(i==<span class="number">1</span>) res++; <span class="comment">// 走到各位上的最后一次拆分且没有break出去,说明本身是一个不降数,ans++</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	init(); <span class="comment">// 预处理不降数个数</span></span><br><span class="line">	<span class="type">int</span> l,r;</span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">cin</span>&gt;&gt;l&gt;&gt;r) &#123;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;dp(r)-dp(l<span class="number">-1</span>)&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="12-样例解析">1.2. 样例解析</span></h3><ul>
+<li>统计 $[1,2557]$ 的不降数个数，对 $2557$ 进行拆分存储到 $a$ 数组中，从高位到低位依次枚举数字 $2,5,5,7$。<ul>
+<li>当枚举到最高位 $2$ 时，$last&#x3D;0$，则最高位可以取 $[0,1]$，$res+&#x3D;f[4,0]+f[4,1]$；</li>
+<li>当枚举到下一位 $5$ 时，$last&#x3D;2$（更新，满足不降数），则这一位可取 $[2,4]$，$res+&#x3D;f[3,2]+f[3,3]+f[3,4]$</li>
+<li>当枚举到下一位 $5$ 时，$last&#x3D;5$，$last&lt;now$ 中没有可取元素，故跳过</li>
+<li>当枚举到最后一位 $7$ 时，$last&#x3D;5$，故这一位可取 $[5,6]$，$res+&#x3D;f[2,5]+f[2,6]$，枚举到最后一位都没有退出，说明 $n&#x3D;2557$ 本身也为一个不降数，故 $res+&#x3D;1$</li>
+</ul>
+</li>
+<li>统计 $[1,1]$ 的不降数个数，就是 $1$，所以 $res&#x3D;1$</li>
+<li>二者做差，最终结果为 $472$</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240504133801132.png" alt="image-20240504133801132"></p>
+<ul>
+<li>统计 $[1,5728]$ 的不降数个数，对 $5728$ 进行拆分存储到 $a$ 数组中，从高位到低位依次枚举数字 $5,7,2,8$。<ul>
+<li>当枚举到最高位 $5$ 时，$last&#x3D;0$，则最高位可以取 $[0,4]$，$res+&#x3D;f[4,0]+f[4,1]+f[4,2]+f[4,3]+f[4,4]$；</li>
+<li>当枚举到下一位 $7$ 时，$last&#x3D;5$（更新，满足不降数），则这一位可取 $[5,6]$，$res+&#x3D;f[3,5]+f[3,6]$</li>
+<li>当枚举到下一位 $2$ 时，$last&#x3D;7$，$last&gt;now$ 不满足不降数，直接 $break$</li>
+</ul>
+</li>
+<li>统计 $[1,1]$ 的不降数个数，就是 $1$，所以 $res&#x3D;1$</li>
+<li>二者做差，最终结果为 $669$</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240504134452689.png" alt="image-20240504134452689"></p>
+<h2><span id="2-windy数">2. Windy数</span></h2><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1fa4y1H7J6/?spm_id_from=333.999.0.0">E37 数位DP Windy数_bilibili</a><br>求区间 $[a,b]$ 中不含前导 $0$ 且相邻两个数字之差至少为 $2$ 的正整数（$Windy$ 数）个数</p>
+</blockquote>
+<ul>
+<li><p>注意，个位数都是 $Windy$ 数，并且 $Windy$ 数不含前导 $0$，而上一题中是可以包含前导 $0$ 的，毕竟在最高位补 $0$ 并不影响这个数字是否为不降数，因为 $0$ 始终是最小的</p>
+</li>
+<li><p>状态表示：$f[i,j]$ 表示一共有 $i$ 位，且最高位数字为 $j$ 的 $Windy$ 数的个数</p>
+</li>
+<li><p>分段统计（思路）：同样的，用 $last$ 记录上一位数字，枚举当前位 $j$，如果 $abs(j-last)&gt;&#x3D;2$ （成为 $Windy$ 数条件）就累加答案，$res+&#x3D;f[i,j]$；前面的答案都是 $n$ 位的，对于位数低于 $n$ 位的，再分段统计，累加到答案中即可，例如：$[100,999]$、$[10,99]$、$[1,9]$</p>
+</li>
+<li><p>本题在使用数位$DP$的技巧时需要注意：因为不存在前导 $0$，所以最高位只能补 $[1,a_1-1]$，而其他位是 $[0,a_i-1]$</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240504203750057.png" alt="image-20240504203750057"></p>
+<h3><span id="21-完整代码">2.1. 完整代码</span></h3><ul>
+<li>代码需要注意几个地方，因为不含前导 $0$，所以从高位到低位处理</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">12</span>; <span class="comment">// INT_MAX=2×10^9,稍微多开一点空间</span></span><br><span class="line"><span class="type">int</span> a[N]; <span class="comment">// 每一位存进a</span></span><br><span class="line"><span class="type">int</span> f[N][<span class="number">10</span>]; <span class="comment">// f[i][j]:一共有i位,最高位为j的Windy数的个数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 预处理出所有Windy数,时间复杂度1000</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">init</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;=<span class="number">9</span>;i++) &#123;</span><br><span class="line">		f[<span class="number">1</span>][i]=<span class="number">1</span>; <span class="comment">// 一位数均为Windy数,包括0	</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;f[%d %d]=%d\n&quot;</span>,<span class="number">1</span>,i,f[<span class="number">1</span>][i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 1) 枚举位数(从2位数开始)</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">2</span>;i&lt;N;i++) &#123;</span><br><span class="line">		<span class="comment">// 2) 枚举第i位</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;=<span class="number">9</span>;j++) &#123;</span><br><span class="line">			<span class="comment">// 3) 枚举第i-1位</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> k=<span class="number">0</span>;k&lt;=<span class="number">9</span>;k++) &#123;</span><br><span class="line">				<span class="comment">// 如果满足Windy数条件,则转移</span></span><br><span class="line">				<span class="keyword">if</span>(<span class="built_in">abs</span>(k-j)&gt;=<span class="number">2</span>) &#123; <span class="comment">// 求出所有k-j&gt;=2和j-k&gt;=2的情况</span></span><br><span class="line">					f[i][j]+=f[i<span class="number">-1</span>][k]; 	</span><br><span class="line">					<span class="built_in">printf</span>(<span class="string">&quot;f[%d %d]=%d\n&quot;</span>,i,j,f[i][j]);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 求1~x的所有Windy数的个数</span></span><br><span class="line"><span class="comment">// 注意,数位DP时一定保证枚举到的数不超过x本身</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">dp</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">	<span class="keyword">if</span>(!x) <span class="keyword">return</span> <span class="number">0</span>; <span class="comment">// 特判,如果x==0返回0</span></span><br><span class="line">	<span class="type">int</span> cnt=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(x) a[++cnt]=x%<span class="number">10</span>,x/=<span class="number">10</span>; <span class="comment">// 将x拆位存进数组a</span></span><br><span class="line">	<span class="comment">// 1) 答案是cnt位的情况,那么最高位的取值范围是[1,now-1],如r=1234</span></span><br><span class="line">	<span class="type">int</span> res=<span class="number">0</span>,last=<span class="number">-2</span>; <span class="comment">// last取一个≤-1的值即可,只要保证j-last&gt;=2</span></span><br><span class="line">	<span class="comment">// 从最高位到低位枚举</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=cnt;i&gt;=<span class="number">1</span>;i--) &#123;</span><br><span class="line">		<span class="type">int</span> now=a[i]; <span class="comment">// 取出当前位数字</span></span><br><span class="line">		<span class="comment">// 最高位从1开始,此时i==cnt,不是最高位就从0开始</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=(i==cnt);j&lt;now;j++) &#123;</span><br><span class="line">			<span class="keyword">if</span>(<span class="built_in">abs</span>(j-last)&gt;=<span class="number">2</span>) &#123;</span><br><span class="line">				res+=f[i][j];</span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">&quot;i=%d f[%d %d]=%d res=%d\n&quot;</span>,i,i,j,f[i][j],res);</span><br><span class="line">				<span class="built_in">cout</span>&lt;&lt;now&lt;&lt;<span class="string">&#x27; &#x27;</span>&lt;&lt;last&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 不满足定义直接break掉</span></span><br><span class="line">		<span class="keyword">if</span>(<span class="built_in">abs</span>(now-last)&lt;<span class="number">2</span>) <span class="keyword">break</span>;</span><br><span class="line">		last=now; </span><br><span class="line">		<span class="keyword">if</span>(i==<span class="number">1</span>) &#123;</span><br><span class="line">			res++; <span class="comment">// 能走到a1说明x本身是Windy数故+1</span></span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;i=%d res=%d (走到a1)\n&quot;</span>,i,res);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;以下是答案小于cnt位的情况&quot;</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="comment">// 2) 答案小于cnt位,如r=1234时,对234</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;cnt;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=<span class="number">9</span>;j++) &#123;</span><br><span class="line">			res+=f[i][j];</span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;i=%d f[%d %d]=%d res=%d\n&quot;</span>,i,i,j,f[i][j],res);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;res=%d (加上小于n位的后)\n&quot;</span>,res);</span><br><span class="line">	<span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	init();</span><br><span class="line">	<span class="type">int</span> l,r;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;l&gt;&gt;r;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;dp(r)-dp(l<span class="number">-1</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="22-样例解析">2.2. 样例解析</span></h3><ul>
+<li>求区间 $[1,345]$ 中的 $Windy$ 数，则 $cnt&#x3D;&#x3D;3$<ul>
+<li>当答案为 $3$ 位时 $(cnt)$<ul>
+<li>当枚举到最高位 $now&#x3D;a_i&#x3D;3$ 时，$last&#x3D;-2$，进入 $for$ 循环，最高位能取 $[1,2]$（注意因为不含前导 $0$，最高位只能从 $1$ 开始枚举），故 $res+&#x3D;f[3,1]+f[3,2]$，此时 $now-last&gt;&#x3D;2$ 故不用退出计算，继续看下一位</li>
+<li>当枚举到下一位 $now&#x3D;a_i&#x3D;4$ 时，$last&#x3D;3$，进入 $for$ 循环，这一位能取 $[0,2]$（不是最高位，可以从 $0$ 开始取），但是当 $a_i&#x3D;2$ 时不满足 $last-a_i&gt;&#x3D;2$，所以 $res+&#x3D;f[2,0]+f[2,1]$，不加 $f[2,2]$，此时 $now-last&lt;2$ 了不满足约束条件，所以直接剪枝退出循环</li>
+</ul>
+</li>
+<li>当答案小于 $3$ 位时，这一步是对上一种情况没枚举完的进行枚举，$345$ 是 $3$ 位数，$&lt;cnt$ 的第一个数是 $cnt-1&#x3D;2$，故枚举累加 $[\ f[1,1],\ f[2,9]\ ]$，即 $[1,99]$</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240505094618965.png" alt="image-20240505094618965"></p>
+<ul>
+<li>求区间 $[1,2572]$ 中的 $Windy$ 数，可以自己模拟一下，这里不做阐释</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240505100100091.png" alt="image-20240505100100091"></p>
+<h2><span id="3-度的数量">3. 度的数量</span></h2><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Ff4y1e7YW/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E38 数位DP 度的数量_bilibili</a><br>求区间 $[X,Y]$ 中满足恰好等于 $K$ 个互不相等的 $B$ 的整数次幂之和的数的统计个数</p>
+</blockquote>
+<ul>
+<li>$K$ 个互不相等的 $B$ 的整数次幂，等价于是求 $[X,Y]$ 中有多少个数字在 $B$ 进制表示法下由 $K$ 个 $1$ 组成，其余位都是 $0$</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240506092242964.png" alt="image-20240506092242964"></p>
+<h3><span id="31-状态预处理">3.1. 状态预处理</span></h3><ul>
+<li>状态表示 $f[i,j]$：表示 $i$ 个位置上出现 $j$ 个 $1$ 的组合数，如 $f[4,2]$ 表示 $4$ 位上出现 $2$ 个 $1$ 的组合数，很显然情况有：$0011,\ 0101,\ 1001,\ 1010,\ 1100,\ 0110$，就是组合数学中的 $c_4^2&#x3D;6$</li>
+<li>状态转移 $f[i,j]&#x3D;f[i-1,j-1]+f[i-1,j]$ ：从 $i$ 个数中选 $j$ 个数，分两类，对于第 $1$ 个数选或不选，如果选，则从剩余的 $i-1$ 个数中再选 $j-1$ 个，即 $c_{i-1}^{j-1}$；如果不选，则从剩下 $i-1$ 个数中再选 $j$ 个</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">34</span>; <span class="comment">// INT_MAX大约2×10^10,转换成2进制最多2^31,为了保险稍开大一点</span></span><br><span class="line"><span class="type">int</span> a[N];</span><br><span class="line"><span class="type">int</span> f[N][N]; <span class="comment">// f[i][j]:表示i个位置上放置j个1的组合数,如C42=6,则f[4][2]=6</span></span><br><span class="line"><span class="type">int</span> K,B; <span class="comment">// b进制表示,k个1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 预处理组合数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">init</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;N;i++) f[i][<span class="number">0</span>]=<span class="number">1</span>; <span class="comment">// Cn0=1,cnn的0在下方的递推式中可以得到为1</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;N;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=i;j++) &#123;</span><br><span class="line">			f[i][j]=f[i<span class="number">-1</span>][j<span class="number">-1</span>]+f[i<span class="number">-1</span>][j]; <span class="comment">// 组合数计算公式</span></span><br><span class="line">			<span class="comment">// c(i)(j)=c(i-1)(j-1)+c(i-1)(j)</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="32-状态转移">3.2. 状态转移</span></h3><ul>
+<li>把数字 $n$ 转化为 $B$ 进制数，随后从高位向低位枚举，假设枚举到第 $i$ 位，第 $i$ 位上的数字的 $x$，$last$ 记录第 $i$ 位之前放置 $1$ 的个数， 则分以下情况讨论</li>
+</ul>
+<ol>
+<li>$x&#x3D;&#x3D;0$：直接跳过，继续枚举下一位</li>
+<li>$x&#x3D;&#x3D;1$：第 $i$ 位再分为两种情况<ol>
+<li>第 $i$ 位放 $0$，后面 $i-1$ 位上可以放 $k-last$ 个 $1$，$res+&#x3D;f[i-1][k-last]$</li>
+<li>第 $i$ 为放 $1$，后面 $i-1$ 位上的情况不能用组合数计算，因为要保证答案中的数字比原数字小，所以固定第 $i$ 位为 $1$，继续枚举下一位</li>
+</ol>
+</li>
+</ol>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240506201634106.png" alt="image-20240506201634106"></p>
+<ul>
+<li>比如当 $n&#x3D;65$ 时，转换成 $B&#x3D;4$ 进制数后为 $1001$，从最高位开始枚举，如果 $a_n$ 放 $0$，那么后面的每一位都可以取 $[0,B-1]$ 即 $[0,3]$，故有 $[0000,0333]$，因为 $K&#x3D;2$，而 $a_n$ 为 $0$，所以需要让后 $3$ 中出现 $2$ 个 $0$，所以 $res+&#x3D;f[3][2]$，$f[3][2]$ 中的 $3$ 表示从后 $3$ 位中取，$f[3][2]$ 中的 $2&#x3D;K-last&#x3D;2-0$；当第一位为 $1$，那后 $3$  位就不能随便取，不能超过 $1001$，所以 $a_{n-1}$ 只能取 $0$， $a_{n-2}$ 只能取 $0$，对于最后一位 $a_1$，如果 $a_1$ 放 $0$，$res+&#x3D;f[0][1]$，如果走到 $a_1&#x3D;1$ 说明 $n$ 这个数字本身满足转换为 $B$ 进制数后有 $K$ 个 $1$，其余位为 $0$，故 $res+&#x3D;1$</li>
+</ul>
+<ol start="3">
+<li>$x&gt;1$ ：第 $i$ 位的放置分为三种情况<ol>
+<li>第 $i$ 位放 $0$，后面 $i-1$ 位上可以放 $k-last$ 个 $1$，$res+&#x3D;f[i-1][k-last]$</li>
+<li>第 $i$ 位放 $1$，后面 $i-1$ 位上可以放 $k-last-1$ 个 $1$，$res+&#x3D;f[i-1][k-last-1]$</li>
+<li>第 $i$ 位放大于 $1$ 的数，已经不合题目要求（出现 $k$ 个 $1$，其余位都是 $0$），此时已经不合题意，直接剪枝 $break$</li>
+</ol>
+</li>
+</ol>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240506203156130.png" alt="image-20240506203156130"></p>
+<ul>
+<li>比如当 $n&#x3D;99$ 时，转换成 $B&#x3D;4$ 进制数后为 $1201$，从最高位 $a_n$ 开始枚举，如果 $a_n&#x3D;0$，那么后 $3$ 位都能取 $[0,B-1]$，要在后 $3$ 位中放 $2$ 个 $1$，故有 $res+&#x3D;f[3][2]$，如果 $a_n&#x3D;1$，则现在还需在后 $3$ 位中放 $k-last&#x3D;2-1&#x3D;1$ 个 $1$，若第 $a_{n-1}$ 位取 $0,1$，则后 $2$ 位可以取 $[0,2]$，故有 $[1000,1033]$ 和 $[1100,1133]$，$res+&#x3D;f[2][1]+f[2][0]$，如果 $a_{n-1}$ 取 $2$，此时不满足题目性质，故 $break$</li>
+</ul>
+<h3><span id="33-完整代码">3.3. 完整代码</span></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">34</span>; <span class="comment">// INT_MAX大约2×10^10,转换成2进制最多2^31,为了保险稍开大一点</span></span><br><span class="line"><span class="type">int</span> a[N];</span><br><span class="line"><span class="type">int</span> f[N][N]; <span class="comment">// f[i][j]:表示i个位置上放置j个1的组合数,如C42=6,则f[4][2]=6</span></span><br><span class="line"><span class="type">int</span> K,B; <span class="comment">// b进制表示,k个1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 预处理组合数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">init</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;N;i++) f[i][<span class="number">0</span>]=<span class="number">1</span>; <span class="comment">// Cn0=1,cnn的0在下方的递推式中可以得到为1</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;N;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=i;j++) &#123;</span><br><span class="line">			f[i][j]=f[i<span class="number">-1</span>][j<span class="number">-1</span>]+f[i<span class="number">-1</span>][j]; <span class="comment">// 组合数计算公式</span></span><br><span class="line">			<span class="comment">// c(i)(j)=c(i-1)(j-1)+c(i-1)(j)</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">dp</span><span class="params">(<span class="type">int</span> n)</span> &#123;</span><br><span class="line">	<span class="type">int</span> tmp=n; <span class="comment">// 记录n</span></span><br><span class="line">	<span class="keyword">if</span>(!n) <span class="keyword">return</span> <span class="number">0</span>; <span class="comment">// 特判,n==0,则不存在满足这样性质的数字</span></span><br><span class="line">	<span class="type">int</span> cnt=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">while</span>(n) a[++cnt]=n%B,n/=B; <span class="comment">// 将n拆成B进制数字存储至数组a</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 打印数字n和其转换后的结果</span></span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;tmp&lt;&lt;<span class="string">&quot;:&quot;</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=cnt;i++) &#123;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;a[i];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="type">int</span> res=<span class="number">0</span>,last=<span class="number">0</span>; <span class="comment">// last表示第i位前放置1的个数(记录已经放置的1的个数)</span></span><br><span class="line">	<span class="comment">// 从高位到低位枚举</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=cnt;i&gt;=<span class="number">1</span>;i--) &#123;</span><br><span class="line">		<span class="type">int</span> x=a[i]; <span class="comment">// 取出an</span></span><br><span class="line">		<span class="comment">// 1) 第i位==0时,直接跳过枚举下一位(即不进入这个if中)</span></span><br><span class="line">		<span class="comment">// 2) 第i位==1时,则这一位可以放0或1</span></span><br><span class="line">		<span class="keyword">if</span>(x) &#123;</span><br><span class="line">			<span class="comment">// 第一种情况:x位固定可以放0</span></span><br><span class="line">			res+=f[i<span class="number">-1</span>][K-last]; <span class="comment">// 第i位放0,则从后i-1位中放K-last个0</span></span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;(1)i=%d f[%d %d]=%d res=%d\n&quot;</span>,i,i<span class="number">-1</span>,K-last,f[i<span class="number">-1</span>][K-last],res);</span><br><span class="line">			<span class="comment">// 第i位&gt;1时,则可以取[0,1,...,ai-1]</span></span><br><span class="line">			<span class="keyword">if</span>(x&gt;<span class="number">1</span>) &#123;</span><br><span class="line">				<span class="keyword">if</span>(K-last<span class="number">-1</span>&gt;=<span class="number">0</span>) &#123;</span><br><span class="line">					<span class="comment">// 第二种情况:x&gt;1,在本位可以放1</span></span><br><span class="line">					<span class="built_in">printf</span>(<span class="string">&quot;(2)i=%d f[%d %d]=%d res=%d\n&quot;</span>,i,i<span class="number">-1</span>,K-last,f[i<span class="number">-1</span>][K-last<span class="number">-1</span>],res);</span><br><span class="line">					res+=f[i<span class="number">-1</span>][K-last<span class="number">-1</span>]; <span class="comment">// 第i位放1,则从后i-1位中放K-last-1个0</span></span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">break</span>; <span class="comment">// 第i位放大于1的数,不合要求直接break</span></span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="comment">// 第i位==1时,不能使用组合数计算,则继续枚举下一位</span></span><br><span class="line">				last++; <span class="comment">// 出现的1的个数+1</span></span><br><span class="line">				<span class="keyword">if</span>(last&gt;K) <span class="keyword">break</span>; <span class="comment">// 1的个数多余k,break</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span>(i==<span class="number">1</span> &amp;&amp; last==K) &#123;</span><br><span class="line">			<span class="comment">// 第三种情况=&gt; 走到数字本身</span></span><br><span class="line">			res++; <span class="comment">// 特判,走到末尾了,+1</span></span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;(3)i=%d res=%d\n&quot;</span>,i,res);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> x,y;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line"><span class="comment">//	cout&lt;&lt;INT_MAX&lt;&lt;endl;</span></span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;x&gt;&gt;y&gt;&gt;K&gt;&gt;B;</span><br><span class="line">	init();</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;dp(y)-dp(x<span class="number">-1</span>)&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="34-样例解析">3.4. 样例解析</span></h3><ul>
+<li>当 $n&#x3D;65$ 时转换成 $4$ 进制数为 $1001$，从 $a4&#x3D;1$ 开始枚举，若 $a4$ 取 $0$，则 $res+&#x3D;f[i-1][k-last]&#x3D;f[3][2]&#x3D;3$；$a_3&#x3D;0,\ a_2&#x3D;0$，没有比其更小的数；$a_1&#x3D;1$，若 $a_1$ 取 $0$，则 $res+&#x3D;f[i-1]<a href="f%5B0%5D%5B1%5D">k-last</a>&#x3D;3$，最后走到 $a_1&#x3D;1$，$1001$ 本身满足性质，所以 $res+&#x3D;1&#x3D;&#x3D;4$</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240506210646018.png" alt="image-20240506210646018"></p>
+<ul>
+<li>当 $n&#x3D;97$ 时转换成 $4$ 进制数为 $1201$，从 $a_4&#x3D;1$ 开始枚举，若 $a_4$ 取 $0$，则 $res+&#x3D;f[i-1][k-last]&#x3D;f[3][2]&#x3D;3$；$a_3&#x3D;2$，则 $a_3$ 可以取 $[0,1]$，当 $a_3&#x3D;0$ 时，$res+&#x3D;f[i-1][k-last]&#x3D;f[2][1]&#x3D;2$，当 $a_3&#x3D;1$ 时，$res+&#x3D;f[i-1][k-last-1]&#x3D;f[2][0]$，因为 $a_3&#x3D;2&gt;1$ 此时不满足题目性质，所以 $break$</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240506211653186.png" alt="image-20240506211653186"></p>
+<ul>
+<li>当 $n&#x3D;85$ 时转换成 $4$ 进制数为 $1111$，从 $a_4&#x3D;1$ 开始枚举，若 $a_4$ 取 $0$，则 $res+&#x3D;f[i-1][k-last]&#x3D;f[3][2]&#x3D;3$，$a_4&#x3D;1$ 不用计算组合数跳过到下一位，继续枚举 $a_3&#x3D;1$，若 $a_3$ 取 $0$，则 $res+&#x3D;f[i-1][k-last]&#x3D;f[2][1]&#x3D;2$，若 $a_3&#x3D;1$ 不用计算组合数跳过到下一位，继续枚举 $a_2&#x3D;1$，若 $a_2$ 取 $0$，则 $res+&#x3D;f[i-1][k-last]&#x3D;f[1][0]&#x3D;1$，若 $a_2$ 取 $1$，此时 $last&#x3D;&#x3D;3&gt;k$，则 $break$</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240506212218740.png" alt="image-20240506212218740"></p>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2024/11/07/%E6%95%B0%E4%BD%8DDP/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2024/11/08/%E6%A0%91%E7%8A%B6%E6%95%B0%E7%BB%84/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            树状数组
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2024/11/07/%E7%8A%B6%E5%8E%8BDP/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">状压DP</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.staticfile.org/valine/1.4.16/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "92B90kPxtBbndNGuCdYouFEO-gzGzoHsz",
+    app_key: "GnHcvbn2eo3Vvqi6x4X90ogH",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2024
+        <i class="ri-heart-fill heart_icon"></i> John Doe
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-sea-side.svg" alt="漂至"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2106426315&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<!-- hexo injector body_end start --><script data-pjax src="https://unpkg.com/oh-my-live2d"></script><script>const oml2d = OML2D.loadOml2d({dockedPosition:"left",mobileDisplay:true,models:[{"path":"https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json","scale":0.12,"position":[0,0],"stageStyle":{"width":250},"mobileScale":0.08,"mobilePosition":[0,0],"mobileStageStyle":{"width":180}}],parentElement:document.body,primaryColor:"var(--btn-bg)",sayHello:false,tips:{style: {"width":230,"height":120,"left":"calc(50% - 20px)","top":"-100px"},mobileStyle: {"width":180,"height":80,"left":"calc(50% - 30px)","top":"-100px"},idleTips:{interval:15000,message:function(){
+  return axios.get('https://v1.hitokoto.cn?c=i')
+    .then(function (response) {
+      return response.data.hitokoto ;
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+}}});</script><!-- hexo injector body_end end --></body>
+
+</html>

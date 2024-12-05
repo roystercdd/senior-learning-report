@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="生活,思考,代码,博客,摄影" />
+       
+      <meta name="description" content="欢迎光临CDD的个人网站~~~" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>线性DP |  漂至</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/deadpool.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="漂至" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-线性DP"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  线性DP
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2024/11/07/%E7%BA%BF%E6%80%A7DP/" class="article-date">
+  <time datetime="2024-11-07T13:08:21.000Z" itemprop="datePublished">2024-11-07</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">6.2k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">28 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <meta name="referrer" content="no-referrer">
+
+<h1><span id="线性dp">线性DP</span></h1><!-- toc -->
+
+<ul>
+<li><a href="#1-%E6%95%B0%E5%AD%97%E4%B8%89%E8%A7%92%E5%BD%A2">1. 数字三角形</a><ul>
+<li><a href="#11-%E9%A1%BA%E6%8E%A8">1.1. 顺推</a></li>
+<li><a href="#12-%E9%80%86%E6%8E%A8">1.2. 逆推</a></li>
+</ul>
+</li>
+<li><a href="#2-%E6%9C%80%E9%95%BF%E4%B8%8A%E5%8D%87%E5%AD%90%E5%BA%8F%E5%88%97">2. 最长上升子序列</a><ul>
+<li><a href="#21-%E7%BA%BF%E6%80%A7dp%E5%81%9A%E6%B3%95">2.1. 线性DP做法</a></li>
+<li><a href="#22-%E4%BA%8C%E5%88%86%E4%BC%98%E5%8C%96">2.2. 二分优化</a></li>
+</ul>
+</li>
+<li><a href="#3-%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E5%BA%8F%E5%88%97">3. 最长公共子序列</a></li>
+<li><a href="#4-%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E4%B8%B2">4. 最长公共子串</a></li>
+<li><a href="#5-%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%BC%96%E8%BE%91%E8%B7%9D%E7%A6%BB">5. 字符串编辑距离</a></li>
+<li><a href="#6-%E8%82%A1%E7%A5%A8%E9%97%AE%E9%A2%98">6. 股票问题</a><ul>
+<li><a href="#61-%E8%82%A1%E7%A5%A8%E4%BA%A4%E6%98%93">6.1. 股票交易</a></li>
+<li><a href="#62-%E8%82%A1%E7%A5%A8%E4%B9%B0%E5%8D%96-k-%E7%AC%94%E4%BA%A4%E6%98%93">6.2. 股票买卖 $k$ 笔交易</a><ul>
+<li><a href="#621-%E4%B8%89%E7%BB%B4%E6%95%B0%E7%BB%84">6.2.1. 三维数组</a></li>
+<li><a href="#622-%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84">6.2.2. 二维数组</a></li>
+</ul>
+</li>
+<li><a href="#63-%E8%82%A1%E7%A5%A8%E4%B9%B0%E5%8D%96%E5%90%AB%E5%86%B7%E5%86%BB%E6%9C%9F">6.3. 股票买卖含冷冻期</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+
+<span id="more"></span>
+
+
+
+<h2><span id="1-数字三角形">1. 数字三角形</span></h2><h3><span id="11-顺推">1.1. 顺推</span></h3><ul>
+<li>顺推比较需要注意的问题就是边界问题，因为从上往下推每个元素会用到上方元素和左上方元素<ul>
+<li>对于某一行的最后一个元素，那么上方的元素是没有被初始化的</li>
+<li>对于某一行的第一个元素，那么左上方的元素是没有被初始化的</li>
+<li>为了保证这两种情况一定不选择未被初始化的元素，所以首先把 $f$ 数组初始化为 $-INF$</li>
+</ul>
+</li>
+<li>随后把 $f[1,1]$ 初始化为 $a[1,1]$，因为从第二行开始计算，这样计算出来的值就是正常值，最后从最后一行的出口中枚举找一个最大值</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">5e2</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> INF=<span class="number">1e9</span>;</span><br><span class="line"><span class="type">int</span> f[N][N];</span><br><span class="line"><span class="type">int</span> a[N][N];</span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=i;j++) &#123;</span><br><span class="line">			<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>,&amp;a[i][j]);</span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 如果顺推,每个元素应该考虑上方和左上方元素</span></span><br><span class="line">	<span class="comment">// 如果当前计算元素的[i,j]刚好i==j即最后一个时,则上方无元素,会遇到边界问题</span></span><br><span class="line">	<span class="comment">// 为了一定不选择这个边界,可以把其初始化为-INF(因为三角形中数字可能有负值)</span></span><br><span class="line">	<span class="comment">// 别忘了左上角,所以ij均从0开始</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;=i+<span class="number">1</span>;j++) &#123;</span><br><span class="line">			f[i][j]=-INF;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	f[<span class="number">1</span>][<span class="number">1</span>]=a[<span class="number">1</span>][<span class="number">1</span>]; <span class="comment">// 从a[1][1]开始算,边界依然为-INF</span></span><br><span class="line">	<span class="comment">// 从第二行开始</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">2</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=i;j++) &#123;</span><br><span class="line">			f[i][j]=max(f[i<span class="number">-1</span>][j]+a[i][j],f[i<span class="number">-1</span>][j<span class="number">-1</span>]+a[i][j]);</span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="type">int</span> ans=INT_MIN;</span><br><span class="line">	<span class="comment">// 对出口求最大值,即为最大路径数字和</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		ans=max(ans,f[n][i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;ans;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="12-逆推">1.2. 逆推</span></h3><ul>
+<li>从上往下有五个出口，最终要用 $O(n)$ 的时间来判断谁的值更大，如果从下往上那么出口只有一个，无需比较；并且从下往上逆推不会遇到边界问题，用到的每个元素都刚好有初始值，可以手动模拟一下为什么没有边界问题</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: 经典数字三角形</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">5e2</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> INF=<span class="number">1e9</span>;</span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"><span class="type">int</span> a[N][N];</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="comment">// 逆推,从下往上那么出口只有一个,注意元素只从下方和右下方来</span></span><br><span class="line">	<span class="comment">// 从下往上没有边界问题</span></span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=i;j++) &#123;</span><br><span class="line">			<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>,&amp;a[i][j]);</span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 从倒数第二行开始</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=n<span class="number">-1</span>;i&gt;=<span class="number">1</span>;i--) &#123;</span><br><span class="line">		<span class="comment">// 每一行的元素的个数应该就是i</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=i;j++) &#123;</span><br><span class="line">			a[i][j]+=max(a[i+<span class="number">1</span>][j],a[i+<span class="number">1</span>][j+<span class="number">1</span>]);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;a[<span class="number">1</span>][<span class="number">1</span>]&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>若需要输出路径，可以用 $b$ 数组 $memcpy$ 原二维数组，因为加和是直接在原数组上进行操作的，另外用 $p$ 表示前驱数组用来记录路径，在记录时只需要记录在列方向的偏移量即可，比如往右下则 $p[i,j]&#x3D;1$，往下 $p[i,j]&#x3D;0$</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: 经典数字三角形</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">5e2</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> INF=<span class="number">1e9</span>;</span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"><span class="type">int</span> a[N][N];</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> p[N][N]; <span class="comment">// 记录最大值路径</span></span><br><span class="line"><span class="type">int</span> b[N][N]; <span class="comment">// 备份数组,路径跟踪</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="comment">// 逆推,从下往上那么出口只有一个,注意元素只从下方和右下方来</span></span><br><span class="line">	<span class="comment">// 从下往上没有边界问题</span></span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=i;j++) &#123;</span><br><span class="line">			<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>,&amp;a[i][j]);</span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 拷贝</span></span><br><span class="line">	<span class="built_in">memcpy</span>(b,a,<span class="keyword">sizeof</span> a); <span class="comment">// 从a拷到b</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 从倒数第二行开始</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=n<span class="number">-1</span>;i&gt;=<span class="number">1</span>;i--) &#123;</span><br><span class="line">		<span class="comment">// 每一行的元素的个数应该就是i</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=i;j++) &#123;</span><br><span class="line"><span class="comment">//			a[i][j]+=max(a[i+1][j],a[i+1][j+1]);</span></span><br><span class="line">			<span class="keyword">if</span>(a[i+<span class="number">1</span>][j]&gt;=a[i+<span class="number">1</span>][j+<span class="number">1</span>]) &#123;</span><br><span class="line">				a[i][j]+=a[i+<span class="number">1</span>][j];</span><br><span class="line">				p[i][j]=<span class="number">0</span>; <span class="comment">// 来自下方,y轴增量为0</span></span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				a[i][j]+=a[i+<span class="number">1</span>][j+<span class="number">1</span>];</span><br><span class="line">				p[i][j]=<span class="number">1</span>; <span class="comment">// 来自右下,y轴增量为1</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;a[<span class="number">1</span>][<span class="number">1</span>]&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="type">int</span> i,j;</span><br><span class="line">	<span class="comment">// 输出最大数的路径(行数一直增大,列数根据存储的增量变化)</span></span><br><span class="line">	<span class="keyword">for</span>(i=<span class="number">1</span>,j=<span class="number">1</span>;i&lt;=n<span class="number">-1</span>;i++) &#123;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;b[i][j]&lt;&lt;<span class="string">&quot;-&gt;&quot;</span>;</span><br><span class="line">		j+=p[i][j];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;b[n][j];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="2-最长上升子序列">2. 最长上升子序列</span></h2><h3><span id="21-线性dp做法">2.1. 线性DP做法</span></h3><blockquote>
+<p>时间复杂度：$O(n^2)$</p>
+</blockquote>
+<ul>
+<li>如果不理解状态转移方程，可以 <a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1KK4y1e7t7/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E03 线性DP 最长上升子序列 bilibili</a> $4:00$ 起看该问题的模拟过程</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">int</span> a[N];</span><br><span class="line"><span class="type">int</span> f[N]; <span class="comment">// 以第i个元素结尾的LIS(最长上升子序列)长度</span></span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>,&amp;a[i]);	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="type">int</span> res=INT_MIN;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		f[i]=<span class="number">1</span>; <span class="comment">// 所有元素起码可以以自身结尾</span></span><br><span class="line">		<span class="comment">// 遍历i之前的元素,如果比i小则可以拼接</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=i;j++) &#123;</span><br><span class="line">			<span class="comment">// 不理解可以看视频中的模拟过程</span></span><br><span class="line">			<span class="keyword">if</span>(a[j]&lt;a[i]) &#123;</span><br><span class="line">				f[i]=max(f[i],f[j]+<span class="number">1</span>);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		res=max(res,f[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;res&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="22-二分优化">2.2. 二分优化</span></h3><blockquote>
+<p>时间复杂度：$O(nlog^n)$，因为二分查找是 $O(log^n)$</p>
+</blockquote>
+<ul>
+<li>模拟过程在 <a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Kp4y1e77H/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E04 线性DP 最长上升子序列 二分优化 bilibili</a> $6:15$ 起</li>
+<li>唯一比较疑惑的地方在于，为什么是找到第一个大于等于 $a[i]$ 的元素做替换而不是大于呢？翻了一下评论区搞明白了，比如 ${1\  2\  6\  7\  2\  3}$ 的话，如果大于 $x$，那么序列中可能出现重复元素，最长上升子序列为 $1\ 2\ 2\ 3$，这样就不是严格单调递增的了</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">int</span> a[N];</span><br><span class="line"><span class="type">int</span> b[N]; <span class="comment">// 有序子序列</span></span><br><span class="line"><span class="type">int</span> len;</span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>,&amp;a[i]);	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 遍历a中每一个元素,构造有序子序列</span></span><br><span class="line">	len=<span class="number">1</span>;</span><br><span class="line">	b[<span class="number">1</span>]=a[<span class="number">1</span>];</span><br><span class="line">	<span class="comment">// 1)如果a中元素大于b中最后一个元素,则添加到末尾</span></span><br><span class="line">	<span class="comment">// 2)如果a中元素小于等于b中最后一个元素,则在b数组中找到第一个大于等于a的元素进行替换</span></span><br><span class="line">	<span class="comment">// 比如a[i]替换掉b[j]后,b[j]变小,则b[1...j]的结尾元素更小,则更可能续其他元素,使ILS更大</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">2</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">if</span>(a[i]&gt;b[len]) &#123;</span><br><span class="line">			b[++len]=a[i];</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// 用二分找到第一个大于等于a[i]的元素(答案在左边,压缩右边界)</span></span><br><span class="line">			<span class="type">int</span> l=<span class="number">1</span>,r=len;</span><br><span class="line">			<span class="keyword">while</span>(l&lt;=r) &#123;</span><br><span class="line">				<span class="type">int</span> mid=l+r&gt;&gt;<span class="number">1</span>;</span><br><span class="line">				<span class="keyword">if</span>(b[mid]&gt;=a[i]) &#123;</span><br><span class="line">					r=mid<span class="number">-1</span>;</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					l=mid+<span class="number">1</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">// l是答案</span></span><br><span class="line">			b[l]=a[i];</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 最终len的长度就是答案</span></span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;len&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="3-最长公共子序列">3. 最长公共子序列</span></h2><ul>
+<li>为什么没有 a[i]≠b[j]，且 a[i], b[j] 都不在公共子序列的情况？其实可以把这种情况归为第 2, 3 种情况之一</li>
+<li>为什么没有 a[i]≠b[j]，且 a[i], b[j] 都不在公共子序列的情况？其实可以把这种情况归为第 2, 3 种情况之一</li>
+</ul>
+<p><img src="E:\Typora\图片\image-20240411143809881.png" alt="image-20240411143809881"></p>
+<ul>
+<li>一边 $dp$ 一边打标记记录状态转移，其中从左上方转移过来的元素即为 $LCS$ 中的公共元素</li>
+</ul>
+<p><img src="E:\Typora\图片\image-20240411144744745.png" alt="image-20240411144744745"></p>
+<ul>
+<li>只要理解了状态转移方程，代码就很简单</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e3</span>+<span class="number">5</span>; <span class="comment">// 字符串最大长度</span></span><br><span class="line"><span class="type">int</span> f[N][N]; <span class="comment">// f[i][j]:序列a[1...i]和b[1...j]的最长公共子序列的长度(LCS)</span></span><br><span class="line"><span class="type">char</span> a[N],b[N];</span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;a+<span class="number">1</span>&gt;&gt;b+<span class="number">1</span>; <span class="comment">// 从下标1开始存储</span></span><br><span class="line">	n=<span class="built_in">strlen</span>(a+<span class="number">1</span>); <span class="comment">// 起始位置是a+1</span></span><br><span class="line">	m=<span class="built_in">strlen</span>(b+<span class="number">1</span>);</span><br><span class="line">	<span class="comment">// 初始化 f[0][j]=0,f[i][0]=0,即i和j中有未指向任意元素的指针存在时</span></span><br><span class="line">    <span class="comment">// 但是全局变量本身初始化为0,所以无需初始化</span></span><br><span class="line">    <span class="comment">// 枚举字符串a</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">        <span class="comment">// 枚举字符串b</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=m;j++) &#123;</span><br><span class="line">			<span class="keyword">if</span>(a[i]==b[j]) &#123;</span><br><span class="line">				f[i][j]=f[i<span class="number">-1</span>][j<span class="number">-1</span>]+<span class="number">1</span>;</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				f[i][j]=max(f[i<span class="number">-1</span>][j],f[i][j<span class="number">-1</span>]);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;f[n][m];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>如果要带路径输出呢？同理，开一个数组 $p$ 用来记录取得 $LCS$ 的路径，注意，只有来自左上方的元素是 $LCS$ 中的元素</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e3</span>+<span class="number">5</span>; <span class="comment">// 字符串最大长度</span></span><br><span class="line"><span class="type">int</span> f[N][N]; <span class="comment">// f[i][j]:序列a[1...i]和b[1...j]的最长公共子序列的长度(LCS)</span></span><br><span class="line"><span class="type">char</span> a[N],b[N];</span><br><span class="line"><span class="type">int</span> p[N][N]; <span class="comment">// 前驱数组</span></span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;a+<span class="number">1</span>&gt;&gt;b+<span class="number">1</span>; <span class="comment">// 从下标1开始存储</span></span><br><span class="line">	n=<span class="built_in">strlen</span>(a+<span class="number">1</span>); <span class="comment">// 起始位置是a+1</span></span><br><span class="line">	m=<span class="built_in">strlen</span>(b+<span class="number">1</span>);</span><br><span class="line">	<span class="comment">// 初始化 f[0][j]=0,f[i][0]=0,即i和j中有未指向任意元素的指针存在时</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=m;j++) &#123;</span><br><span class="line">			<span class="keyword">if</span>(a[i]==b[j]) &#123;</span><br><span class="line">				f[i][j]=f[i<span class="number">-1</span>][j<span class="number">-1</span>]+<span class="number">1</span>;</span><br><span class="line">				p[i][j]=<span class="number">1</span>; <span class="comment">// 来自↖</span></span><br><span class="line">			&#125; <span class="keyword">else</span> <span class="keyword">if</span>(f[i<span class="number">-1</span>][j]&gt;f[i][j<span class="number">-1</span>]) &#123;</span><br><span class="line">				f[i][j]=f[i<span class="number">-1</span>][j];</span><br><span class="line">				p[i][j]=<span class="number">2</span>; <span class="comment">// 来自←</span></span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				f[i][j]=f[i][j<span class="number">-1</span>];</span><br><span class="line">				p[i][j]=<span class="number">3</span>; <span class="comment">// 来自↑</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;f[n][m]&lt;&lt;<span class="built_in">endl</span>; <span class="comment">// 最长长度</span></span><br><span class="line">	<span class="type">int</span> i=n,j=m,k=f[n][m];</span><br><span class="line">	<span class="built_in">vector</span>&lt;<span class="type">char</span>&gt; path;</span><br><span class="line">	<span class="comment">// i或j中任意一个元素=0时退出</span></span><br><span class="line">	<span class="keyword">while</span>(i&gt;<span class="number">0</span> &amp;&amp; j&gt;<span class="number">0</span>) &#123;</span><br><span class="line">		<span class="comment">// 左上方</span></span><br><span class="line">		<span class="keyword">if</span>(p[i][j]==<span class="number">1</span>) &#123;</span><br><span class="line">			path.push_back(a[i]); <span class="comment">// LCS中</span></span><br><span class="line">			i--,j--;</span><br><span class="line">		&#125; </span><br><span class="line">		<span class="comment">// 上方</span></span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span>(p[i][j]==<span class="number">2</span>) &#123;</span><br><span class="line">			i--;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 左方</span></span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			j--;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	reverse(path.begin(),path.end());</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">auto</span> x:path) &#123;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;x&lt;&lt;<span class="string">&#x27; &#x27;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="4-最长公共子串">4. 最长公共子串</span></h2><ul>
+<li>这一题和上一题有什么区别呢？序列可以是不连续的，但是串一定是连续的，区别就在此</li>
+<li>最长公共子序列中 $f[i,j]$ 表示序列 $a[1…i]$ 和 $b[1…j]$ 的最长公共子序列的长度</li>
+<li>最长公共子串中 $f[i,j]$ 表示以 $a[i]$ 和 $b[j]$ 为结尾的公共子串的长度</li>
+</ul>
+<p><img src="E:\Typora\图片\image-20240411161150378.png" alt="image-20240411161150378"></p>
+<p><img src="E:\Typora\图片\image-20240411164021914.png" alt="image-20240411164021914"></p>
+<ul>
+<li>则可以得到状态转移方程<ul>
+<li>若 $a[i]&#x3D;&#x3D;b[j]$，构成公共子串，$f[i,j]&#x3D;f[i-1,j-1]+1$</li>
+<li>若 $a[i]!&#x3D;b[j]$，不能构成公共子串，$f[i,j]&#x3D;0$（为什么不记录为最大值呢？因为串必须是连续的）</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e3</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line"><span class="type">char</span> a[N],b[N];</span><br><span class="line"><span class="type">int</span> f[N][N]; <span class="comment">// 以a[i]和b[j]结尾的最长公共子串的长度</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;a+<span class="number">1</span>&gt;&gt;b+<span class="number">1</span>;</span><br><span class="line">	n=<span class="built_in">strlen</span>(a+<span class="number">1</span>);</span><br><span class="line">	m=<span class="built_in">strlen</span>(b+<span class="number">1</span>);</span><br><span class="line">	<span class="comment">// 无需初始化,全局变量</span></span><br><span class="line">    <span class="type">int</span> len=INT_MIN; <span class="comment">// 最长公共子串长度 </span></span><br><span class="line">    <span class="type">int</span> st=<span class="number">0</span>; <span class="comment">// 起始点</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=m;j++) &#123;</span><br><span class="line">			<span class="comment">// 必须要连续才相加</span></span><br><span class="line">			<span class="keyword">if</span>(a[i]==b[j]) &#123;</span><br><span class="line">				f[i][j]=f[i<span class="number">-1</span>][j<span class="number">-1</span>]+<span class="number">1</span>;</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				f[i][j]=<span class="number">0</span>;</span><br><span class="line">			&#125;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 保存第一个最长公共子串</span></span><br><span class="line">            <span class="keyword">if</span>(f[i][j]&gt;=len) &#123;</span><br><span class="line">                len=f[i][j];</span><br><span class="line">                st=i-len+<span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">			<span class="comment">// ans=max(ans,f[i][j]);</span></span><br><span class="line">		&#125; </span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 以最后一个元素结尾的不一定是最长公共子串的长度</span></span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;len&lt;&lt;<span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=st;i&lt;=st+len<span class="number">-1</span>;i++) &#123;</span><br><span class="line">        <span class="built_in">cout</span>&lt;&lt;a[i];</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="5-字符串编辑距离">5. 字符串编辑距离</span></h2><ul>
+<li>$f[i,j]$ 表示从 $a[1…i]$ 变成 $b[1…j]$ 的编辑距离</li>
+<li>若 $a[i]&#x3D;b[j]$，$f[i,j]&#x3D;f[i-1,j-1]$ ：因为新位置 $i$ 和 $j$ 的元素是相等的，无需编辑转移</li>
+<li>若 $a[i]!&#x3D;b[j]$<ul>
+<li>修改，即 $a$ 中前 $i-1$ 项 和 $b$ 中前 $j-1$ 项已然相等，只需要把最后一项修改为 $b[j]$ 即可，所以有 $f[i,j]&#x3D;f[i-1,j-1]+1$</li>
+<li>插入，即 $a$ 中前 $i$ 项和 $b$ 中前 $j-1$ 项相等，只需要再插入一项 $b[j]$ 即可，所以有 $f[i,j]&#x3D;f[i,j-1]+1$</li>
+<li>删除，即 $a$ 中前 $i-1$ 项和 $b$ 中前 $j$ 项相等，但是多了一项，所以有 $f[i,j]&#x3D;f[i-1,j]+1$</li>
+<li>由于属性是取最小值，所以三者中取 $min$ 即可</li>
+</ul>
+</li>
+</ul>
+<p><img src="E:\Typora\图片\image-20240411171937474.png" alt="image-20240411171937474"></p>
+<ul>
+<li>二维数组的常规做法如下，关于滚动数组优化这里不做解释，因为自己都搞得不是很清楚</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e3</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line"><span class="type">char</span> a[N],b[N];</span><br><span class="line"><span class="type">int</span> f[N][N];</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;a+<span class="number">1</span>&gt;&gt;b+<span class="number">1</span>;</span><br><span class="line">	n=<span class="built_in">strlen</span>(a+<span class="number">1</span>);</span><br><span class="line">	m=<span class="built_in">strlen</span>(b+<span class="number">1</span>);</span><br><span class="line">	<span class="comment">// 从a[1...i]变成空串,需要是删除i次</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		f[i][<span class="number">0</span>]=i;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 从空串变成b[1...j],需要添加j次</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=m;j++) &#123;</span><br><span class="line">		f[<span class="number">0</span>][j]=j;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 状态转移</span></span><br><span class="line">	<span class="comment">// 如果记录一下状态转移就可以输出变化过程</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=m;j++) &#123;</span><br><span class="line">			<span class="comment">// 末尾相等,无需添加</span></span><br><span class="line">			<span class="keyword">if</span>(a[i]==b[i]) &#123;</span><br><span class="line">				f[i][j]=f[i<span class="number">-1</span>][j<span class="number">-1</span>];</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				f[i][j]=min(f[i<span class="number">-1</span>][j],min(f[i][j<span class="number">-1</span>],f[i<span class="number">-1</span>][j<span class="number">-1</span>]))+<span class="number">1</span>; <span class="comment">// 三种操作的最小值</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;f[n][m]&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="6-股票问题">6. 股票问题</span></h2><h3><span id="61-股票交易">6.1. 股票交易</span></h3><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1iK4y177jT/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E22 线性DP 股票买卖_bilibili</a></p>
+</blockquote>
+<ul>
+<li><p>状态表示：</p>
+<ul>
+<li>$f[i][0]$：第 $i$ 天手中无票时获取的最大利润</li>
+<li>$f[i][1]$：第 $i$ 天手中有票时获取的最大利润</li>
+</ul>
+</li>
+<li><p>状态属性：$max$</p>
+</li>
+<li><p>状态转移：</p>
+<ul>
+<li><p>当前手中无票，可能是上一个状态未买入股票，故有 $f[i][0]&#x3D;f[i-1][0]$；也可以前一天有票，但是卖出了，此时收入为 $f[i][0]&#x3D;f[i-1][1]+w[i]$，所以无票时状态转移方程为：$f[i][0]&#x3D;max(f[i-1][0],f[i-1][1]+w[i])$</p>
+</li>
+<li><p>当前手中有票，可能是上一个状态手中本来有票，但未卖出股票，故有 $f[i][1]&#x3D;f[i-1][1]$；也可以前一天无票，但是买入了，此时收入为 $f[i][1]&#x3D;f[i-1][0]-w[i]$，为何是减呢？因为买入嘛，我们的收益减去 $w[i]$，所以有票时状态转移方程为：$f[i][1]&#x3D;max(f[i-1][1],f[i-1][0]-w[i])$</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240426153152625.png" alt="image-20240426153152625"></p>
+<ul>
+<li><p>边界初值：</p>
+<ul>
+<li>第 $1$ 天无票：$f[1][0]&#x3D;0$</li>
+<li>第 $1$ 天有票：$f[1][1]&#x3D;-w[i]$</li>
+</ul>
+</li>
+<li><p>目标值：</p>
+<ul>
+<li>第 $n$ 天事件结束时手上无票：$f[n][0]$</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"><span class="type">int</span> w[N];</span><br><span class="line"><span class="type">int</span> f[N][<span class="number">2</span>]; <span class="comment">// f[i][0]:第i天手上没有股票的最大利润,f[i][1]:第i天手上有股票</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="built_in">cin</span>&gt;&gt;w[i];	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 初始化</span></span><br><span class="line">	f[<span class="number">1</span>][<span class="number">0</span>]=<span class="number">0</span>;</span><br><span class="line">	f[<span class="number">1</span>][<span class="number">1</span>]=-w[<span class="number">1</span>]; <span class="comment">// 买下</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">2</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="comment">// 第i天无股票,可能是第i-1天无股票或者有股票卖了转移来的</span></span><br><span class="line">		<span class="comment">// 第i天有股票,可能是第i-1天有股票没卖或者无股票才买来的</span></span><br><span class="line">		f[i][<span class="number">0</span>]=max(f[i<span class="number">-1</span>][<span class="number">0</span>],f[i<span class="number">-1</span>][<span class="number">1</span>]+w[i]);</span><br><span class="line">		f[i][<span class="number">1</span>]=max(f[i<span class="number">-1</span>][<span class="number">1</span>],f[i<span class="number">-1</span>][<span class="number">0</span>]-w[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;f[n][<span class="number">0</span>]; <span class="comment">// 第n天无股票一定最大</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="62-股票买卖-k-笔交易">6.2. 股票买卖 $k$ 笔交易</span></h3><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1ka4y1s7ER/?spm_id_from=333.788.recommend_more_video.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E23 线性DP 股票买卖K笔交易_bilibili</a></p>
+</blockquote>
+<h4><span id="621-三维数组">6.2.1. 三维数组</span></h4><ul>
+<li><p>状态表示：</p>
+<ul>
+<li>$f[i][j][0]$：前 $i$ 天已经进行了 $j$ 次交易，当前手中无票，能获取的最大利润</li>
+<li>$f[i][j][1]$：前 $i$ 天已经进行了 $j$ 次交易，当前手中有票，能获取的最大利润</li>
+</ul>
+</li>
+<li><p>状态属性：$max$</p>
+</li>
+<li><p>状态转移：</p>
+<ul>
+<li><p>当前手中无票，可能昨天也无票，并且没有买入，故有 $f[i][j][0]&#x3D;f[i-1][j][0]$；也可能前一天有票，但是卖出了，正好完成了第 $j$ 交易，此时收入为 $f[i][j][0]&#x3D;f[i-1][j][1]+w[i]$，所以无票时状态转移方程为：$f[i][0]&#x3D;max(f[i-1][j][0],f[i][j][0]&#x3D;f[i-1][j][1]+w[i])$</p>
+</li>
+<li><p>当前手中有票，可能是上一个状态手中本来有票，但未卖出股票，故有 $f[i][j][1]&#x3D;f[i-1][j][1]$；也可以前一天无票，但是买入了，那么说明前 $j-1$ 次交易已完成，当前正要计算的是第 $j$ 次交易，故有 $f[i][j][1]&#x3D;f[i-1][j-1][0]-w[i]$，所以有票时状态转移方程为：$f[i][j][1]&#x3D;max(f[i-1][j][1],f[i-1][j-1][0]-w[i])$</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240426155643592.png" alt="image-20240426155643592"></p>
+<ul>
+<li><p>边界初值：</p>
+<ul>
+<li>第 $0$ 天无票：$f[0][j][0]&#x3D;0$，第 $0$ 天有票：$f[0][j][1]&#x3D;-1e6$（该状态非法，且我们要找最大值，所以赋一个极小值）</li>
+<li>每一天还未进行交易时：$f[i][0][0]&#x3D;0$</li>
+</ul>
+</li>
+<li><p>目标值：</p>
+<ul>
+<li>第 $n$ 天事件结束时刚好进行了 $k$ 次交易且手上无票：$f[n][k][0]$</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e3</span>+<span class="number">2</span>; <span class="comment">// 最大天数</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> M=<span class="number">1e2</span>+<span class="number">2</span>; <span class="comment">// 最大交易次数</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> f[N][M][<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> w[N]; <span class="comment">// 每天股票的价格</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n,k; <span class="comment">// 天数和交易次数</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n&gt;&gt;k;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="built_in">cin</span>&gt;&gt;w[i];	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 初始化第0天的情况</span></span><br><span class="line">	<span class="comment">// 合法则赋可取的有限值</span></span><br><span class="line">	<span class="comment">// 非法则赋负无穷(找最大值)或正无穷(找最小值)</span></span><br><span class="line">	<span class="built_in">memset</span>(f,<span class="number">0</span>,<span class="keyword">sizeof</span> f);</span><br><span class="line">	<span class="comment">// 第0天,手中无票,初值为0,手中有票,状态非法,负无穷(为找最大值)</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;=k;j++) f[<span class="number">0</span>][j][<span class="number">1</span>]=<span class="number">-1e6</span>;</span><br><span class="line">	<span class="comment">// 第0笔,f[i][0][0]=0, 已经memset了</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 三维数组!!!</span></span><br><span class="line">	<span class="comment">// 第1~n天,交易次数为1~k</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=k;j++) &#123;</span><br><span class="line">			<span class="comment">// 1) 前一天没买股票</span></span><br><span class="line">			<span class="comment">// 2) 前一天卖了股票,完成第j次交易</span></span><br><span class="line">			f[i][j][<span class="number">0</span>]=max(f[i<span class="number">-1</span>][j][<span class="number">0</span>],f[i<span class="number">-1</span>][j][<span class="number">1</span>]+w[i]);</span><br><span class="line">			<span class="comment">// 1) 前一天没卖股票</span></span><br><span class="line">			<span class="comment">// 2) 前一天买了股票,说明前一天已经完成了前j-1次交易,今天买股票处在第j次交易之中</span></span><br><span class="line">			f[i][j][<span class="number">1</span>]=max(f[i<span class="number">-1</span>][j][<span class="number">1</span>],f[i<span class="number">-1</span>][j<span class="number">-1</span>][<span class="number">0</span>]-w[i]);</span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;f[n][k][<span class="number">0</span>]; <span class="comment">// 第n天完成k次交易且手中无票</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="622-二维数组">6.2.2. 二维数组</span></h4><ul>
+<li>观察三维数组的代码我们会发现，当前状态只与上一层状态有关，所以可以类似于 $01$ 背包那样优化掉一维，直接把第一维去掉即可，那为什么不用像 $01$ 背包那样逆序遍历背包容量呢？</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240426161021747.png" alt="image-20240426161021747"></p>
+<ul>
+<li>继续观察三维时的状态转移方程，会发现 $f[i][j][0]$ 和 $f[i][j][1]$ 都独立的用上一层的两个状态来进行更新，二者之间没有相互影响，所以无论是逆序还是正序都不会出错</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240426161330033.png" alt="image-20240426161330033"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e3</span>+<span class="number">2</span>; <span class="comment">// 最大天数</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> M=<span class="number">1e2</span>+<span class="number">2</span>; <span class="comment">// 最大交易次数</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> f[N][M][<span class="number">2</span>];</span><br><span class="line"><span class="type">int</span> ff[N][<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> w[N]; <span class="comment">// 每天股票的价格</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n,k; <span class="comment">// 天数和交易次数</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n&gt;&gt;k;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="built_in">cin</span>&gt;&gt;w[i];	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 二维滚动数组优化!!!注意听为什么不用逆序</span></span><br><span class="line">	<span class="comment">// 直接去掉第一维即可 且不逆序</span></span><br><span class="line">	<span class="comment">// 关于为什么直接去掉一维就可以了我也不得而知啊啊啊 dp有点难</span></span><br><span class="line">	<span class="built_in">memset</span>(ff,<span class="number">0</span>,<span class="keyword">sizeof</span> ff);</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;=k;j++) ff[j][<span class="number">1</span>]=<span class="number">-1e6</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=k;j++) &#123;</span><br><span class="line">			ff[j][<span class="number">0</span>]=max(ff[j][<span class="number">0</span>],ff[j][<span class="number">1</span>]+w[i]);</span><br><span class="line">			ff[j][<span class="number">1</span>]=max(ff[j][<span class="number">1</span>],ff[j<span class="number">-1</span>][<span class="number">0</span>]-w[i]);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;ff[k][<span class="number">0</span>];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="63-股票买卖含冷冻期">6.3. 股票买卖含冷冻期</span></h3><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV15v411r7WD/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E24 线性DP 股票买卖含冷冻期 bilibili</a></p>
+</blockquote>
+<ul>
+<li><p>引入了一天的冷冻期之后，我们在状态转移时就不能单单从昨天来看，要引入新一天：前天</p>
+</li>
+<li><p>状态表示：</p>
+<ul>
+<li>$f[i][0]$：第 $i$ 天手中无票时获取的最大利润</li>
+<li>$f[i][1]$：第 $i$ 天手中有票时获取的最大利润</li>
+</ul>
+</li>
+<li><p>状态属性：$max$</p>
+</li>
+<li><p>状态转移：</p>
+<ul>
+<li><p>当前手中无票，可能是上一个状态未买入股票，故有 $f[i][0]&#x3D;f[i-1][0]$；也可以前一天有票，但是卖出了，此时收入为 $f[i][0]&#x3D;f[i-1][1]+w[i]$，所以无票时状态转移方程为：$f[i][0]&#x3D;max(f[i-1][0],f[i-1][1]+w[i])$</p>
+</li>
+<li><p>当前手中有票，可能是上一个状态手中本来有票，但未卖出股票，故有 $f[i][1]&#x3D;f[i-1][1]$；也可能是之前无票，但是买入了股票，注意此时只能从 $i-2$ （前天）的状态转移，因为如果昨天恰好是卖出股票的第一天，就出大问题了，此时收入为 $f[i][1]&#x3D;f[i-2][0]-w[i]$，所以有票时状态转移方程为：$f[i][1]&#x3D;max(f[i-1][1],f[i-2][0]-w[i])$</p>
+</li>
+<li><p>那么这个状态转移方程就和第一个问题的方程非常非常类似了</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240426155643592.png" alt="image-20240426155643592"></p>
+<ul>
+<li><p>边界初值：</p>
+<ul>
+<li>为何要从第 $0$ 天开始判断？因为我们引入了前天的概念</li>
+<li>第 $0$ 天无票：$f[0][0]&#x3D;0$</li>
+<li>第 $0$ 天有票：$f[0][1]&#x3D;-1e6$，状态非法，又因为找最大值所以给极小值（$DP$ 问题初始化技巧）</li>
+</ul>
+</li>
+<li><p>目标值：</p>
+<ul>
+<li>第 $n$ 天事件结束时手上无票：$f[n][0]$</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: 加了一个限制,卖出股票后第二天不能买入股票(1天冷冻期)</span></span><br><span class="line"><span class="comment">// 所以需要考虑的状态有前天,昨天和今天</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">int</span> f[N][<span class="number">2</span>]; <span class="comment">// f[i][0]:第i天手上无票,f[i][1]:第i天手上有票</span></span><br><span class="line"><span class="type">int</span> w[N];</span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">7</span></span><br><span class="line"><span class="comment">5 2 6 1 3 4 6</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="built_in">cin</span>&gt;&gt;w[i];	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 1)初始化</span></span><br><span class="line">	f[<span class="number">0</span>][<span class="number">0</span>]=<span class="number">0</span>; <span class="comment">// 第0天手上无票自然为0,dp入口</span></span><br><span class="line">	f[<span class="number">0</span>][<span class="number">1</span>]=<span class="number">-1e9</span>; <span class="comment">// 第0天手上有票为非法状态,因为找最大值所以初始化为负无穷</span></span><br><span class="line">	<span class="comment">// 2)dp</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="comment">// 第i天无票,前一天本身无票或前一天卖出</span></span><br><span class="line">		f[i][<span class="number">0</span>]=max(f[i<span class="number">-1</span>][<span class="number">0</span>],f[i<span class="number">-1</span>][<span class="number">1</span>]+w[i]);</span><br><span class="line">		<span class="comment">// 第i天有票,前一天有票未卖出或前两天买入(有冷冻期存在)</span></span><br><span class="line">		f[i][<span class="number">1</span>]=max(f[i<span class="number">-1</span>][<span class="number">1</span>],f[i<span class="number">-2</span>][<span class="number">0</span>]-w[i]);</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;第&quot;</span>&lt;&lt;i&lt;&lt;<span class="string">&quot;天:&quot;</span>&lt;&lt;<span class="string">&quot; f[0]=&quot;</span>&lt;&lt;f[i][<span class="number">0</span>]&lt;&lt;<span class="string">&quot; ,f[1]=&quot;</span>&lt;&lt;f[i][<span class="number">1</span>]&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;f[n][<span class="number">0</span>];</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2024/11/07/%E7%BA%BF%E6%80%A7DP/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" rel="tag">动态规划</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E7%AB%9E%E8%B5%9B/" rel="tag">算法竞赛</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BA%BF%E6%80%A7DP/" rel="tag">线性DP</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2024/11/07/%E5%8C%BA%E9%97%B4DP/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            区间DP
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2024/11/07/%E8%83%8C%E5%8C%85DP/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">背包DP</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.staticfile.org/valine/1.4.16/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "92B90kPxtBbndNGuCdYouFEO-gzGzoHsz",
+    app_key: "GnHcvbn2eo3Vvqi6x4X90ogH",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2024
+        <i class="ri-heart-fill heart_icon"></i> John Doe
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-sea-side.svg" alt="漂至"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2106426315&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<!-- hexo injector body_end start --><script data-pjax src="https://unpkg.com/oh-my-live2d"></script><script>const oml2d = OML2D.loadOml2d({dockedPosition:"left",mobileDisplay:true,models:[{"path":"https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json","scale":0.12,"position":[0,0],"stageStyle":{"width":250},"mobileScale":0.08,"mobilePosition":[0,0],"mobileStageStyle":{"width":180}}],parentElement:document.body,primaryColor:"var(--btn-bg)",sayHello:false,tips:{style: {"width":230,"height":120,"left":"calc(50% - 20px)","top":"-100px"},mobileStyle: {"width":180,"height":80,"left":"calc(50% - 30px)","top":"-100px"},idleTips:{interval:15000,message:function(){
+  return axios.get('https://v1.hitokoto.cn?c=i')
+    .then(function (response) {
+      return response.data.hitokoto ;
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+}}});</script><!-- hexo injector body_end end --></body>
+
+</html>

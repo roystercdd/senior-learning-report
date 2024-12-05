@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="生活,思考,代码,博客,摄影" />
+       
+      <meta name="description" content="欢迎光临CDD的个人网站~~~" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>图论最短路 |  漂至</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/deadpool.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="漂至" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-图论最短路"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  图论最短路
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2024/10/04/%E5%9B%BE%E8%AE%BA%E6%9C%80%E7%9F%AD%E8%B7%AF/" class="article-date">
+  <time datetime="2024-10-04T12:56:35.000Z" itemprop="datePublished">2024-10-04</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">3.9k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">17 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <meta name="referrer" content="no-referrer">
+
+<h1><span id="图论最短路">图论最短路</span></h1><!-- toc -->
+
+<ul>
+<li><a href="#1-%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF">1. 单源最短路</a><ul>
+<li><a href="#11-%E6%89%80%E6%9C%89%E8%BE%B9%E6%9D%83%E9%83%BD%E6%98%AF%E6%AD%A3%E6%95%B0">1.1. 所有边权都是正数</a><ul>
+<li><a href="#111-%E6%9C%B4%E7%B4%A0-dijkstra-%E7%AE%97%E6%B3%95">1.1.1. 朴素 $Dijkstra$ 算法</a></li>
+<li><a href="#112-%E5%A0%86%E4%BC%98%E5%8C%96-dijkstra">1.1.2. 堆优化 $Dijkstra$</a></li>
+</ul>
+</li>
+<li><a href="#12-%E5%AD%98%E5%9C%A8%E8%B4%9F%E6%9D%83%E8%BE%B9">1.2. 存在负权边</a><ul>
+<li><a href="#121-bellman-ford">1.2.1. Bellman-Ford</a></li>
+<li><a href="#122-spfa">1.2.2. SPFA</a></li>
+<li><a href="#123-spfa%E5%88%A4%E8%B4%9F%E7%8E%AF">1.2.3. SPFA判负环</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#2-%E5%A4%9A%E6%BA%90%E6%B1%87%E6%9C%80%E7%9F%AD%E8%B7%AF">2. 多源汇最短路</a><ul>
+<li><a href="#21-floyd%E7%AE%97%E6%B3%95">2.1. Floyd算法</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+
+<span id="more"></span>
+
+
+
+<h2><span id="1-单源最短路">1. 单源最短路</span></h2><blockquote>
+<p>从一个点到其他所有点的最短距离</p>
+</blockquote>
+<ul>
+<li>对于单源最短路径问题的时间复杂度和空间复杂度如下，对于空间复杂度需强调：对于稀疏图（边较少），倾向于使用<strong>邻接表</strong>和<strong>链式前向星</strong>，如果使用邻接矩阵容易爆内存；对于稠密图（边多），倾向于使用邻接矩阵，因为邻接表每个元素都是一个结点，占用的内存可能比邻接矩阵中的一格大，使用邻接矩阵反而内存占用更少。</li>
+<li>注意，无向图是一种特殊的有向图，所以我们背板子的时候不用特别区分有向图和无向图。</li>
+<li>对于<strong>稠密图</strong>（边的数量接近于顶点数量的平方），使用邻接矩阵的时间复杂度通常更低，因为你可以在 $O(1)$ 的时间内访问任何边。然而，邻接矩阵的空间复杂度是 $O(V^2)$ ，这可能会导致内存超限。</li>
+<li>对于<strong>稀疏图</strong>（边的数量远小于顶点数量的平方），使用邻接表的时间复杂度通常更低，因为你只需要遍历与每个顶点相连的边。邻接表的空间复杂度是 $O(E)$ ，这通常比邻接矩阵更节省空间。</li>
+</ul>
+<img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20231018161346568.png" alt="image-20231018161346568" style="zoom:67%;">
+
+
+
+<h3><span id="11-所有边权都是正数">1.1. 所有边权都是正数</span></h3><h4><span id="111-朴素-dijkstra-算法">1.1.1. 朴素 $Dijkstra$ 算法</span></h4><blockquote>
+<p>时间复杂度 $O(n²)$：$n$ 表示点的数量，和边数无关，适合稠密图，空间复杂度 $O(n^2)$</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 朴素dijkstra</span></span><br><span class="line"><span class="comment">// 1:初始化距离,dist[1]=0,dist[v]=+inf,s是当前已经确定最短距离的点</span></span><br><span class="line"><span class="comment">// 2:for v in [1,n]:①不在s中的距离最近的点;②t→s;③用t更新其他点的距离</span></span><br><span class="line"><span class="comment">// 3:循环n次后,已经求出每个点到第一个点的最短距离</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 稠密图→邻接矩阵</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">5e2</span><span class="number">+5</span>; </span><br><span class="line"><span class="comment">// 点最大是500*500=2.5*10^5&gt;题目给的m最大值</span></span><br><span class="line"><span class="comment">// 注意:存在重边和自环</span></span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line"><span class="type">int</span> g[N][N]; <span class="comment">// 存储图</span></span><br><span class="line"><span class="type">int</span> dist[N]; <span class="comment">// 每个点到第一个点的距离</span></span><br><span class="line"><span class="type">bool</span> st[N]; <span class="comment">// 每个点的访问状态</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">dijkstra</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 先把距离初始化为不可达</span></span><br><span class="line">	<span class="built_in">memset</span>(dist,<span class="number">0x3f</span>,<span class="keyword">sizeof</span> dist);</span><br><span class="line">	dist[<span class="number">1</span>]=<span class="number">0</span>; <span class="comment">// 第一个点到自身的距离为0</span></span><br><span class="line">	<span class="comment">// 对于每一个结点,我们每遍历一次就把一个点加入到已经找到最短路径的队列中</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;n;i++) &#123;</span><br><span class="line">		<span class="type">int</span> t=<span class="number">-1</span>; <span class="comment">// 初始化t为-1,t用于记录当前未被访问的结点中距离源节点最近的结点</span></span><br><span class="line">		<span class="comment">// 遍历所有结点,找到每个结点距离自己最近且尚未加入&quot;已经找到最短路径&quot;点集的结点</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=n;j++)</span><br><span class="line">			<span class="comment">// !st[j]:结点j未被访问,t为-1,或者t到源节点的距离小于j到源节点的距离</span></span><br><span class="line">			<span class="keyword">if</span>(!st[j] &amp;&amp; (t==<span class="number">-1</span> || dist[t]&gt;dist[j]))</span><br><span class="line">				t=j;</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// 如果当前结点的最近结点就是n,那么直接跳出(优化意义不明显)</span></span><br><span class="line">		<span class="keyword">if</span>(t==n)</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		</span><br><span class="line">		st[t]=<span class="literal">true</span>;</span><br><span class="line">		<span class="comment">// 以t为跳板,更新所有结点到源节点的最短距离</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=n;j++)</span><br><span class="line">			dist[j]=<span class="built_in">min</span>(dist[j],dist[t]+g[t][j]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 不存在最短路返回-1,存在则返回最大距离值</span></span><br><span class="line">	<span class="keyword">if</span>(dist[n]==<span class="number">0x3f3f3f3f</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	<span class="keyword">return</span> dist[n];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	ios::<span class="built_in">sync_with_stdio</span>(<span class="number">0</span>);</span><br><span class="line">	cin.<span class="built_in">tie</span>(<span class="number">0</span>);</span><br><span class="line">	cout.<span class="built_in">tie</span>(<span class="number">0</span>);</span><br><span class="line">	</span><br><span class="line">	cin&gt;&gt;n&gt;&gt;m;</span><br><span class="line">	<span class="comment">// 初始化邻接矩阵为互不可达</span></span><br><span class="line">	<span class="built_in">memset</span>(g,<span class="number">0x3f</span>,<span class="keyword">sizeof</span> g);</span><br><span class="line">	<span class="keyword">while</span>(m--) &#123;</span><br><span class="line">		<span class="type">int</span> a,b,c;</span><br><span class="line">		cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;</span><br><span class="line">		g[a][b]=<span class="built_in">min</span>(g[a][b],c); <span class="comment">// 去除重边</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="type">int</span> t=<span class="built_in">dijkstra</span>();</span><br><span class="line">	cout&lt;&lt;t&lt;&lt;endl;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="112-堆优化-dijkstra">1.1.2. 堆优化 $Dijkstra$</span></h4><blockquote>
+<p>时间复杂度 $O(mlogn)$：$n$ 表示点的数量、$m$ 表示边的数量，适合稀疏图，空间复杂度 $O(m+n)$</p>
+</blockquote>
+<ul>
+<li>该代码可以解决带有重边和自环的有向图、无向图。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e6</span><span class="number">+5</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> M=N;</span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line"><span class="comment">// h:每个结点的第一条边</span></span><br><span class="line"><span class="comment">// e:每条边的下一个结点</span></span><br><span class="line"><span class="comment">// ne:每条边的下一条边</span></span><br><span class="line"><span class="comment">// w:每条边的权重</span></span><br><span class="line"><span class="type">int</span> h[N],e[N],ne[N],w[N],idx;</span><br><span class="line"><span class="type">int</span> dist[N]; <span class="comment">// 邻接表存储最短距离</span></span><br><span class="line"><span class="type">bool</span> st[N]; <span class="comment">// 访问状态</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b,<span class="type">int</span> c)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 第idx条边指向节点b,第idx边边权为c,第idx条的下一条边是a的起始边(头插法思想),起始边更新为当前边编号,编号自增</span></span><br><span class="line">	e[idx]=b,w[idx]=c,ne[idx]=h[a],h[a]=idx++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">dijkstra</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 初始化互不可达</span></span><br><span class="line">	<span class="built_in">memset</span>(dist,<span class="number">0x3f</span>,<span class="keyword">sizeof</span> dist);</span><br><span class="line">	<span class="comment">// 编号为1的点到自己距离为0</span></span><br><span class="line">	dist[<span class="number">1</span>]=<span class="number">0</span>;</span><br><span class="line">	priority_queue&lt;PII,vector&lt;PII&gt;,greater&lt;PII&gt;&gt; heap; <span class="comment">// 小根堆</span></span><br><span class="line">	heap.<span class="built_in">push</span>(&#123;<span class="number">0</span>,<span class="number">1</span>&#125;); <span class="comment">// 距离为0,点编号为1(第一关键字存储距离,小根堆默认从小到大排序;第二关键字存储编号)</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 队列不为空</span></span><br><span class="line">	<span class="keyword">while</span>(heap.<span class="built_in">size</span>()) &#123;</span><br><span class="line">		<span class="comment">// 取出头结点</span></span><br><span class="line">		<span class="keyword">auto</span> t=heap.<span class="built_in">top</span>();</span><br><span class="line">		heap.<span class="built_in">pop</span>();</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// v:取出头结点的编号</span></span><br><span class="line">		<span class="comment">// distance:到源节点的距离</span></span><br><span class="line">		<span class="type">int</span> v=t.second;</span><br><span class="line">		<span class="comment">// 如果已访问过,则跳过</span></span><br><span class="line">		<span class="keyword">if</span>(st[v])</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line">		st[v]=<span class="literal">true</span>;</span><br><span class="line">		<span class="comment">// 遍历该结点的所有边,-1是尾边(因为用的是头插法)</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> i=h[v];i!=<span class="number">-1</span>;i=ne[i]) &#123;</span><br><span class="line">			<span class="type">int</span> j=e[i];</span><br><span class="line">			<span class="comment">// 如果距离更短,则更新</span></span><br><span class="line">			<span class="keyword">if</span>(dist[j]&gt;dist[v]+w[i]) &#123;</span><br><span class="line">				dist[j]=dist[v]+w[i];</span><br><span class="line">				<span class="comment">// 节点j的距离和编号加入队列</span></span><br><span class="line">				heap.<span class="built_in">push</span>(&#123;dist[j],j&#125;);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 如果不可达,返回-1</span></span><br><span class="line">	<span class="keyword">if</span>(dist[n]==<span class="number">0x3f3f3f3f</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	<span class="keyword">return</span> dist[n]; <span class="comment">// 否则范围到节点n的距离</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	cin&gt;&gt;n&gt;&gt;m;</span><br><span class="line">	<span class="built_in">memset</span>(h,<span class="number">-1</span>,<span class="keyword">sizeof</span> h);</span><br><span class="line">	<span class="keyword">while</span>(m--) &#123;</span><br><span class="line">		<span class="type">int</span> a,b,c;</span><br><span class="line">		cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;</span><br><span class="line">		<span class="built_in">add</span>(a,b,c);</span><br><span class="line">        <span class="comment">// add(b,a,c); // 无向图</span></span><br><span class="line">	&#125;</span><br><span class="line">	cout&lt;&lt;<span class="built_in">dijkstra</span>()&lt;&lt;endl;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="12-存在负权边">1.2. 存在负权边</span></h3><ul>
+<li><p>$SPFA$ 一般比贝尔曼福特快，如果想求不超过 $k$ 条边的最短路，只能用贝尔曼福特算法来做。需要注意一点，如果存在负权回路，那么最短路是不一定存在的，贝尔曼福特算法可以求出是否存在负权回路，<strong>如果存在负权回路，贝尔曼福特可能求不出最短路径</strong></p>
+</li>
+<li><p>需要注意的是：$SPFA$ 的使用条件是，<strong>一定不存在负环，SPFA本质上是对Bellman-Ford的优化，也可以用于找负环</strong></p>
+</li>
+<li><p>$80%$ 的正权图也能用 $SPFA$ 来做，且时间效率会比 $dijkstra$ 更快，但是如果 $SPFA$ 被卡了，$SPFA$ 的平均时间复杂度是$O(m)$，最坏的情况是$O(nm)$，数据给的差是可能达到最坏情况的，如果被卡了，就换成堆优化的 $dijkstra$</p>
+</li>
+</ul>
+<h4><span id="121-bellman-ford">1.2.1. Bellman-Ford</span></h4><blockquote>
+<p>时间复杂度 $O(nm)$，题目链接：<a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/855/">853. 有边数限制的最短路 - AcWing题库</a></p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Bellman-Ford算法,注意该算法存边随便存,只要能遍历所有边即可</span></span><br><span class="line"><span class="comment">// for循环n次,每一次循环所有边a,b,w,更新最短距离(三角不等式)</span></span><br><span class="line"><span class="comment">// 迭代k次后,dist数组代表的含义:从1号点经过,不超过k条边走到每个点的最短距离</span></span><br><span class="line"><span class="comment">// 如果第n次迭代后dist数组有更新的话,说明一定存在负环,SPFA也可以找负环</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// SPFA一般在任何情况都优于Bellman-fort</span></span><br><span class="line"><span class="comment">// 但是如果有边数限制,如AcWing853,最多经过不超过k条边的最短路径,必须用Bellman-fort</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">5e2</span><span class="number">+10</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> M=<span class="number">1e5</span><span class="number">+10</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n,m,k; <span class="comment">// 点/边/最短路边限制</span></span><br><span class="line"><span class="type">int</span> dist[N],backup[N];</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Edge</span> &#123;</span><br><span class="line">	<span class="type">int</span> a,b,w;	</span><br><span class="line">&#125;edges[M];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">bellman_ford</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 初始化不可达</span></span><br><span class="line">	<span class="built_in">memset</span>(dist,<span class="number">0x3f</span>,<span class="keyword">sizeof</span> dist);</span><br><span class="line">	dist[<span class="number">1</span>]=<span class="number">0</span>; <span class="comment">// 结点1到自身距离为0</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 走k步路</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;k;i++) &#123;</span><br><span class="line">        <span class="comment">// 把dist写进backup</span></span><br><span class="line">		<span class="comment">// 每次复制上一次的状态,因为要求在k步路内的最短距离,所以不能直接更新</span></span><br><span class="line">		<span class="built_in">memcpy</span>(backup,dist,<span class="keyword">sizeof</span> dist);</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;m;j++) &#123;</span><br><span class="line">			<span class="type">int</span> a=edges[j].a,b=edges[j].b,w=edges[j].w;</span><br><span class="line">			dist[b]=<span class="built_in">min</span>(dist[b],backup[a]+w);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 为什么这里不是0x3f3f3f3f呢?</span></span><br><span class="line">	<span class="comment">// 因为如果两个点对于点1都是不可达,但相互可达,则可能在更新时变成不是0x3f3f3f3f的数</span></span><br><span class="line">	<span class="comment">// 所以这里用一个类似于极大值的数来替代</span></span><br><span class="line">	<span class="comment">// 如果没有最短路径,返回0x3f3f3f3f,不返回-1是因为有可能最短距离就是-1</span></span><br><span class="line">	<span class="keyword">if</span>(dist[n]&gt;<span class="number">0x3f3f3f3f</span>/<span class="number">2</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0x3f3f3f3f</span>;</span><br><span class="line">	<span class="keyword">return</span> dist[n];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	ios::<span class="built_in">sync_with_stdio</span>(<span class="number">0</span>);</span><br><span class="line">	cin.<span class="built_in">tie</span>(<span class="number">0</span>);</span><br><span class="line">	cout.<span class="built_in">tie</span>(<span class="number">0</span>);</span><br><span class="line">	cin&gt;&gt;n&gt;&gt;m&gt;&gt;k;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;m;i++) &#123;</span><br><span class="line">		<span class="type">int</span> a,b,w;</span><br><span class="line">		cin&gt;&gt;a&gt;&gt;b&gt;&gt;w;</span><br><span class="line">		edges[i]=&#123;a,b,w&#125;;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="type">int</span> t=<span class="built_in">bellman_ford</span>();</span><br><span class="line">	<span class="keyword">if</span>(t==<span class="number">0x3f3f3f3f</span>)</span><br><span class="line">		cout&lt;&lt;<span class="string">&quot;impossible&quot;</span>;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		cout&lt;&lt;t&lt;&lt;endl;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="122-spfa">1.2.2. SPFA</span></h4><blockquote>
+<p>时间复杂度 一般 $O(m)$，最坏 $O(nm)$，以下模板无视重边和自环，题目链接：<a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/853/">851. spfa求最短路 - AcWing题库</a></p>
+</blockquote>
+ <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// SPFA:长得特别像dijkstra,对于负权图,如果出题人卡SPFA的话就没办法了</span></span><br><span class="line"><span class="comment">// 只要队列不为空</span></span><br><span class="line"><span class="comment">// 弹出队头t,更新t的所有出边</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span><span class="number">+5</span>;</span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line"><span class="type">int</span> h[N],w[N],e[N],ne[N],idx;</span><br><span class="line"><span class="type">int</span> dist[N];</span><br><span class="line"><span class="type">bool</span> st[N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b,<span class="type">int</span> c)</span> </span>&#123;</span><br><span class="line">	e[idx]=b,w[idx]=c,ne[idx]=h[a],h[a]=idx++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">spfa</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 初始化dist为不可达</span></span><br><span class="line">	<span class="built_in">memset</span>(dist,<span class="number">0x3f</span>,<span class="keyword">sizeof</span> dist);</span><br><span class="line">	<span class="comment">// 第一个点的距离为0</span></span><br><span class="line">	dist[<span class="number">1</span>]=<span class="number">0</span>;</span><br><span class="line">	queue&lt;<span class="type">int</span>&gt; q;</span><br><span class="line">	q.<span class="built_in">push</span>(<span class="number">1</span>);</span><br><span class="line">	st[<span class="number">1</span>]=<span class="literal">true</span>;</span><br><span class="line">	<span class="keyword">while</span>(q.<span class="built_in">size</span>()) &#123;</span><br><span class="line">		<span class="comment">// 弹出队头</span></span><br><span class="line">		<span class="type">int</span> t=q.<span class="built_in">front</span>();</span><br><span class="line">		q.<span class="built_in">pop</span>();</span><br><span class="line">		<span class="comment">// 更新状态</span></span><br><span class="line">		st[t]=<span class="literal">false</span>;</span><br><span class="line">		<span class="comment">// 遍历每条边</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> i=h[t];i!=<span class="number">-1</span>;i=ne[i]) &#123;</span><br><span class="line">			<span class="type">int</span> j=e[i];</span><br><span class="line">			<span class="comment">// 如果距离更短则更新</span></span><br><span class="line">			<span class="keyword">if</span>(dist[j]&gt;dist[t]+w[i]) &#123;</span><br><span class="line">				dist[j]=dist[t]+w[i];</span><br><span class="line">				<span class="comment">// 如果没访问过则加入队列</span></span><br><span class="line">				<span class="keyword">if</span>(!st[j]) &#123;</span><br><span class="line">					q.<span class="built_in">push</span>(j);</span><br><span class="line">					st[j]=<span class="literal">true</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 不可达不要返回-1,因为有可能最短路径就是-1</span></span><br><span class="line">	<span class="keyword">if</span>(dist[n]==<span class="number">0x3f3f3f3f3</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0x3f3f3f3f</span>;</span><br><span class="line">	<span class="keyword">return</span> dist[n];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	cin&gt;&gt;n&gt;&gt;m;</span><br><span class="line">	<span class="built_in">memset</span>(h,<span class="number">-1</span>,<span class="keyword">sizeof</span> h);</span><br><span class="line">	<span class="keyword">while</span>(m--) &#123;</span><br><span class="line">		<span class="type">int</span> a,b,c;</span><br><span class="line">		cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;</span><br><span class="line">		<span class="built_in">add</span>(a,b,c);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="type">int</span> t=<span class="built_in">spfa</span>();</span><br><span class="line">	<span class="keyword">if</span>(t==<span class="number">0x3f3f3f3f</span>)</span><br><span class="line">		cout&lt;&lt;<span class="string">&quot;impossible&quot;</span>;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		cout&lt;&lt;t&lt;&lt;endl;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="123-spfa判负环">1.2.3. SPFA判负环</span></h4><blockquote>
+<p>题目链接：<a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/854/">852. spfa判断负环 - AcWing题库</a></p>
+</blockquote>
+<ul>
+<li>维护一个 $cnt$ 数组，从 $[1,x]$，$cnt$ 数组记录的是在用 $SPFA$ 找$1$号点 到 $n$号点最短路径时，这个最短路中边的个数，如果 $dist[j]&gt;dist[v]+w[i]$ 说明我从 $v$ 这个点到 $j$ 的距离更短，那么从 $i$ → $j$ 就更新为 $i$ → $v$ → $j$，所以边数要 $+1$ ，即有 $cnt[j]&#x3D;cnt[v]+1$ ，如果在某一次中 $cnt[x]&gt;&#x3D;n$ 了，说明一共经历了 $n$ 条边，有$n$ 条边就有 $n+1$ 个点，但是题目中只有 $n$ 个点，说明有一个点出现了两次，即出现了环，又因为 $dist$ 是在不断减小的，所以这一定是一个负环</li>
+<li>还需要注意一点，一开始我们不能直接把 $1$ 号点放进队列来找，因为题目要找的是整个图中是否存在负环，而从 $1$ 号点出发不一定能到这个负环，所以做法是把所有点都放进队列中，那么一定能找到这个负环</li>
+<li>注意 $SPFA$ 判负环时间复杂度其实还蛮高的</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span><span class="number">+10</span>;</span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line"><span class="type">int</span> h[N],w[N],e[N],ne[N],idx;</span><br><span class="line"><span class="type">int</span> dist[N];</span><br><span class="line"><span class="type">bool</span> st[N];</span><br><span class="line"><span class="type">int</span> cnt[N]; <span class="comment">// 判断有无负环,cnt[i]:表示遍历到第i个节点时已遍历过的节点总数</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b,<span class="type">int</span> c)</span> </span>&#123;</span><br><span class="line">	e[idx]=b,w[idx]=c,ne[idx]=h[a],h[a]=idx++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">spfa</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	queue&lt;<span class="type">int</span>&gt; q;</span><br><span class="line">	<span class="comment">// 注意这里不能把1放进去,因为1可能到不了这个负环</span></span><br><span class="line">	</span><br><span class="line"><span class="comment">//	q.push(1);</span></span><br><span class="line">    <span class="comment">// 把每个点都放进去判断</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		st[i]=<span class="literal">true</span>;</span><br><span class="line">		q.<span class="built_in">push</span>(i);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">while</span>(q.<span class="built_in">size</span>()) &#123;</span><br><span class="line">		<span class="type">int</span> t=q.<span class="built_in">front</span>();</span><br><span class="line">		q.<span class="built_in">pop</span>();</span><br><span class="line">		</span><br><span class="line">		st[t]=<span class="literal">false</span>;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> i=h[t];i!=<span class="number">-1</span>;i=ne[i]) &#123;</span><br><span class="line">			<span class="type">int</span> j=e[i];</span><br><span class="line">			<span class="keyword">if</span>(dist[j]&gt;dist[t]+w[i]) &#123;</span><br><span class="line">				dist[j]=dist[t]+w[i];</span><br><span class="line">				cnt[j]=cnt[t]<span class="number">+1</span>; <span class="comment">// 遍历到节点j时遇到的节点总数+1</span></span><br><span class="line">				<span class="keyword">if</span>(cnt[j]&gt;=n) </span><br><span class="line">					<span class="keyword">return</span> <span class="literal">true</span>; <span class="comment">// 有负环</span></span><br><span class="line">				<span class="keyword">if</span>(!st[j]) &#123;</span><br><span class="line">					q.<span class="built_in">push</span>(j);</span><br><span class="line">					st[j]=<span class="literal">true</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	cin&gt;&gt;n&gt;&gt;m;</span><br><span class="line">	<span class="built_in">memset</span>(h,<span class="number">-1</span>,<span class="keyword">sizeof</span> h);</span><br><span class="line">	<span class="keyword">while</span>(m--) &#123;</span><br><span class="line">		<span class="type">int</span> a,b,c;</span><br><span class="line">		cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;</span><br><span class="line">		<span class="built_in">add</span>(a,b,c);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span>(<span class="built_in">spfa</span>()) &#123;</span><br><span class="line">		cout&lt;&lt;<span class="string">&quot;Yes&quot;</span>;	</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		cout&lt;&lt;<span class="string">&quot;No&quot;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="2-多源汇最短路">2. 多源汇最短路</span></h2><blockquote>
+<p>求多个起点到其他点的距离</p>
+</blockquote>
+<h3><span id="21-floyd算法">2.1. Floyd算法</span></h3><blockquote>
+<p>时间复杂度O(n³)，dp的外表，暴力的心，题目链接：<a target="_blank" rel="noopener" href="https://www.acwing.com/problem/content/856/">854. Floyd求最短路 - AcWing题库</a>，以下模板能处理重边、自环、负权边，但不能处理负权回路，因为存在负权回路时距离会不断往下越来越小，无法收敛</p>
+</blockquote>
+<ul>
+<li>注意之所以用 $d[a][b]&gt;INF&#x2F;2$ 来判断是否是不可达是因为题目中存在负权边更新后的距离很有可能比 $INF$ 小一些，要在其他负权边存在的最短路问题中也注意一下</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 弗洛伊德:多源最短路,直接暴力暴暴暴就完事了</span></span><br><span class="line"><span class="comment">// 第一层循环,k从1~n,枚举i→j的中间节点</span></span><br><span class="line"><span class="comment">// 第二层循环,i从1~n</span></span><br><span class="line"><span class="comment">// 第三层循环,j从1~n</span></span><br><span class="line"><span class="comment">// d[i,j]=min(d[i][j],d[i][k]+d[k][j])</span></span><br><span class="line"><span class="comment">// 原理:d[k,i,j]=d[k-1,i,k]+d[k-1,k,j],基于dp</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">2e2</span><span class="number">+2</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> INF=<span class="number">1e9</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n,m,Q; <span class="comment">// Q是循环次数</span></span><br><span class="line"><span class="type">int</span> d[N][N];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">floyd</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> k=<span class="number">1</span>;k&lt;=n;k++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=n;j++) &#123;</span><br><span class="line">				d[i][j]=<span class="built_in">min</span>(d[i][j],d[i][k]+d[k][j]);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	cin&gt;&gt;n&gt;&gt;m&gt;&gt;Q; </span><br><span class="line">	<span class="comment">// 重边和自环的处理方法:</span></span><br><span class="line">	<span class="comment">// 重边:保留最小的边</span></span><br><span class="line">	<span class="comment">// 自环:删除</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=n;j++) &#123;</span><br><span class="line">			<span class="keyword">if</span>(i==j)</span><br><span class="line">				d[i][j]=<span class="number">0</span>; <span class="comment">// 自己到自己的距离为0,赋初值,后比较,去自环</span></span><br><span class="line">			<span class="keyword">else</span></span><br><span class="line">				d[i][j]=INF; <span class="comment">// 初始化邻接矩阵为互不可达</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">while</span>(m--) &#123;</span><br><span class="line">		<span class="type">int</span> a,b,c;</span><br><span class="line">		cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;</span><br><span class="line">		d[a][b]=<span class="built_in">min</span>(d[a][b],c); <span class="comment">// 去重边,保留最小边(邻接矩阵的做法)</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">floyd</span>();</span><br><span class="line">	<span class="keyword">while</span>(Q--) &#123;</span><br><span class="line">		<span class="type">int</span> a,b;</span><br><span class="line">		cin&gt;&gt;a&gt;&gt;b;</span><br><span class="line">		</span><br><span class="line">		<span class="keyword">if</span>(d[a][b]&gt;INF/<span class="number">2</span>) <span class="comment">// 可能会被更新得不是INF</span></span><br><span class="line">			cout&lt;&lt;<span class="string">&quot;impossible&quot;</span>&lt;&lt;endl;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">			cout&lt;&lt;d[a][b]&lt;&lt;endl;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2024/10/04/%E5%9B%BE%E8%AE%BA%E6%9C%80%E7%9F%AD%E8%B7%AF/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%9B%BE%E8%AE%BA/" rel="tag">图论</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%9C%80%E7%9F%AD%E8%B7%AF/" rel="tag">最短路</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E7%AB%9E%E8%B5%9B/" rel="tag">算法竞赛</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2024/10/04/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            深度优先搜索
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2024/10/04/%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">邻接矩阵</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.staticfile.org/valine/1.4.16/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "92B90kPxtBbndNGuCdYouFEO-gzGzoHsz",
+    app_key: "GnHcvbn2eo3Vvqi6x4X90ogH",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2024
+        <i class="ri-heart-fill heart_icon"></i> John Doe
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-sea-side.svg" alt="漂至"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2106426315&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<!-- hexo injector body_end start --><script data-pjax src="https://unpkg.com/oh-my-live2d"></script><script>const oml2d = OML2D.loadOml2d({dockedPosition:"left",mobileDisplay:true,models:[{"path":"https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json","scale":0.12,"position":[0,0],"stageStyle":{"width":250},"mobileScale":0.08,"mobilePosition":[0,0],"mobileStageStyle":{"width":180}}],parentElement:document.body,primaryColor:"var(--btn-bg)",sayHello:false,tips:{style: {"width":230,"height":120,"left":"calc(50% - 20px)","top":"-100px"},mobileStyle: {"width":180,"height":80,"left":"calc(50% - 30px)","top":"-100px"},idleTips:{interval:15000,message:function(){
+  return axios.get('https://v1.hitokoto.cn?c=i')
+    .then(function (response) {
+      return response.data.hitokoto ;
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+}}});</script><!-- hexo injector body_end end --></body>
+
+</html>

@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="生活,思考,代码,博客,摄影" />
+       
+      <meta name="description" content="欢迎光临CDD的个人网站~~~" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>状压DP |  漂至</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/deadpool.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="漂至" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-状压DP"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  状压DP
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2024/11/07/%E7%8A%B6%E5%8E%8BDP/" class="article-date">
+  <time datetime="2024-11-07T15:10:08.000Z" itemprop="datePublished">2024-11-07</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">10.3k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">45 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <meta name="referrer" content="no-referrer">
+
+<h1><span id="状态压缩dp">状态压缩DP</span></h1><!-- toc -->
+
+<ul>
+<li><a href="#1-%E8%92%99%E5%BE%B7%E9%87%8C%E5%AE%89%E7%9A%84%E6%A2%A6%E6%83%B3">1. 蒙德里安的梦想</a><ul>
+<li><a href="#11-%E7%8A%B6%E6%80%81%E9%A2%84%E5%A4%84%E7%90%86">1.1. 状态预处理</a><ul>
+<li><a href="#111-%E5%90%88%E6%B3%95%E7%8A%B6%E6%80%81">1.1.1. 合法状态</a></li>
+<li><a href="#112-%E9%9D%9E%E6%B3%95%E7%8A%B6%E6%80%81">1.1.2. 非法状态</a></li>
+</ul>
+</li>
+<li><a href="#12-%E7%8A%B6%E6%80%81%E8%AE%A1%E7%AE%97">1.2. 状态计算</a></li>
+<li><a href="#13-%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81">1.3. 完整代码</a></li>
+</ul>
+</li>
+<li><a href="#2-%E5%B0%8F%E5%9B%BD%E7%8E%8B">2. 小国王</a><ul>
+<li><a href="#21-%E7%8A%B6%E6%80%81%E9%A2%84%E5%A4%84%E7%90%86">2.1. 状态预处理</a><ul>
+<li><a href="#210-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84">2.1.0. 数据结构</a></li>
+<li><a href="#211-%E8%A1%8C%E5%86%85%E5%90%88%E6%B3%95">2.1.1. 行内合法</a></li>
+<li><a href="#212-%E8%A1%8C%E9%97%B4%E5%85%BC%E5%AE%B9">2.1.2. 行间兼容</a></li>
+</ul>
+</li>
+<li><a href="#22-%E7%8A%B6%E6%80%81%E8%AE%A1%E7%AE%97">2.2. 状态计算</a></li>
+<li><a href="#23-%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81">2.3. 完整代码</a></li>
+</ul>
+</li>
+<li><a href="#3-%E7%8E%89%E7%B1%B3%E7%94%B0">3. 玉米田</a><ul>
+<li><a href="#31-%E7%8A%B6%E6%80%81%E9%A2%84%E5%A4%84%E7%90%86">3.1. 状态预处理</a><ul>
+<li><a href="#310-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84">3.1.0. 数据结构</a></li>
+<li><a href="#311-%E8%A1%8C%E5%86%85%E5%90%88%E6%B3%95">3.1.1. 行内合法</a></li>
+<li><a href="#312-%E8%A1%8C%E9%97%B4%E5%85%BC%E5%AE%B9">3.1.2. 行间兼容</a></li>
+<li><a href="#313-%E4%BB%A3%E7%A0%81">3.1.3. 代码</a></li>
+</ul>
+</li>
+<li><a href="#32-%E7%8A%B6%E6%80%81%E8%AE%A1%E7%AE%97">3.2. 状态计算</a></li>
+<li><a href="#33-%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81">3.3. 完整代码</a></li>
+</ul>
+</li>
+<li><a href="#4-%E7%82%AE%E5%85%B5%E9%98%B5%E5%9C%B0">4. 炮兵阵地</a><ul>
+<li><a href="#41-%E7%8A%B6%E6%80%81%E9%A2%84%E5%A4%84%E7%90%86">4.1. 状态预处理</a><ul>
+<li><a href="#410-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84">4.1.0. 数据结构</a></li>
+<li><a href="#411-%E8%A1%8C%E5%86%85%E5%90%88%E6%B3%95">4.1.1. 行内合法</a></li>
+<li><a href="#412-%E8%A1%8C%E9%97%B4%E5%85%BC%E5%AE%B9">4.1.2. 行间兼容</a></li>
+<li><a href="#413-%E4%BB%A3%E7%A0%81">4.1.3. 代码</a></li>
+</ul>
+</li>
+<li><a href="#42-%E7%8A%B6%E6%80%81%E8%AE%A1%E7%AE%97">4.2. 状态计算</a></li>
+<li><a href="#43-%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81">4.3. 完整代码</a></li>
+<li><a href="#44-%E5%BB%B6%E7%94%B3-%E6%BB%9A%E5%8A%A8%E6%95%B0%E7%BB%84%E4%BC%98%E5%8C%96">4.4. 延申-滚动数组优化</a><ul>
+<li><a href="#441-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84">4.4.1. 数据结构</a></li>
+<li><a href="#442-%E7%8A%B6%E6%80%81%E8%AE%A1%E7%AE%97%E9%83%A8%E5%88%86%E4%BF%AE%E6%94%B9">4.4.2. 状态计算部分修改</a></li>
+<li><a href="#443-%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81">4.4.3. 完整代码</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+
+<span id="more"></span>
+
+
+
+<h2><span id="1-蒙德里安的梦想">1. 蒙德里安的梦想</span></h2><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1cv411b7EG/?spm_id_from=333.999.0.0">E31 状态压缩DP 蒙德里安的梦想_bilibili</a>，参考博客：<a target="_blank" rel="noopener" href="https://www.acwing.com/file_system/file/content/whole/index/content/1634404/">AcWing 291. 蒙德里安的梦想 - AcWing</a></p>
+</blockquote>
+<ul>
+<li>思路：摆放方块时，先放横着的，再放竖着的（先把横着的放完最后用竖着的去填充），方案总数等于只放横着的小方块的合法方案数</li>
+<li>一定要理解下图的状态表示，每一行的状态 $1$ 表示：是横放的向下一列伸出；每一行的状态 $0$ 表示：状态 $1$ 的反集，竖放或由上一列伸出或未摆放<ul>
+<li>对于图1<ul>
+<li>第一列第一行是横放的向下一列伸出，故为1</li>
+<li>第一列第二行是竖放的，故为0</li>
+<li>第一列第三行是竖放的，故为0</li>
+<li>第一列第四含是横放的向下一列深处，故为1</li>
+</ul>
+</li>
+<li>对于图2<ul>
+<li>第二列第一行是由上一列伸出的，故为0</li>
+<li>第二列第二行是横放的向下一列伸出，故为1</li>
+<li>第二列第三行是横放的向下一列伸出，故为1</li>
+<li>第二列第四列是由上一列伸出的，故为0</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240427203142963.png" alt="image-20240427203142963"></p>
+<ul>
+<li>状态表示： $f[i,j]$ 表示已经将前 $i-1$ 列摆好，且从第 $i-1$ 列伸出到第 $i$ 列，状态为 $j$ 时的方案数，比如图 $1$ 的  ${1\ 0\ 0\ 1}$ 转换为十进制就是 $9$ ，所以图 $1$ 表示的是  $f[1,9]$   </li>
+<li>状态转移： $f[i-1,k]→f[i,j]$ ，$f[i,j]$ 可由上一列的多种可行状态转移而来，所以第二维坐标是 $k$ ，如下图中 ${0\ 0\ 1\ 1}$ 可以由 ${0\ 0\ 0\ 0}$ 或者 ${1\ 1\ 0\ 0}$ 转移而来</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240427203858461.png" alt="image-20240427203858461"></p>
+<ul>
+<li>边界赋值：$f[0,0]&#x3D;1$ 不摆是一种方案</li>
+<li>目标值：$f[m,0]$ 摆到第 $m$ 列且每一行都是 $0$，即刚好填满的状态</li>
+</ul>
+<h3><span id="11-状态预处理">1.1. 状态预处理</span></h3><ul>
+<li><p>预处理即是检验在计算第 $i$ 行的状态 $j$ 时能否由第 $i-1$ 行的状态 $k$ 转换（是否合法），如果先进行了预处理的话那么在计算 $dp$ 数组的时候就很容易了</p>
+</li>
+<li><p>我们引入合并列的状态表示</p>
+</li>
+</ul>
+<h4><span id="111-合法状态">1.1.1. 合法状态</span></h4><p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240427210241200.png" alt="image-20240427210241200"></p>
+<ul>
+<li>对于左图，第一列的状态是 $1,\ 1,\ 0,\ 0$，第二列的状态是 $0,\ 0,\ 1,\ 1$，二者做或运算得到的就是合并列的状态，为 $1,\ 1,\ 1,\ 1$，转换为十进制为 $15$，所以 $15$ 为合法状态</li>
+<li>对于右图，第一列的状态是 $1,\ 1,\ 0,\ 0$，第二列的状态是 $0,\ 0,\ 0,\ 0$，二者做或运算得到的就是合并列的状态，为 $1,\ 1,\ 0,\ 0$，转换为十进制为 $12$，所以 $12$ 为合法状态</li>
+<li>二者都为合法状态，当然合法状态不止这些</li>
+<li><strong>为什么要做或运算？</strong></li>
+<li>做或运算主要是为了检验有没有连续的奇数个 $0$，如果有连续的奇数个 $0$，表示按照这种规则摆放横方格，就没法对奇数个 $0$ 的位置摆竖方格。因为每一行上的数字为 $1$ 代表该行上的单元格是伸出的，为 $0$ 代表未伸出，若第 $i-1$ 列为 ${1,\ 1,\ 0,\ 0}$ 就代表第 $i-1$ 列每一行的伸出状态，第 $i$ 列为 ${0,\ 0,\ 1,\ 1}$ 代表第 $i$ 列的伸出状态，做或运算，是对这两列的每一行分别做或运算，如果对于某一行两列都为未伸出状态 $(0)$ 则合并后也为 $(0)$，出现偶数个相邻的 $0$ 可以用竖方格来填充，但是奇数个就没有办法了，所以出现连续奇数个 $0$ 是非法的！</li>
+</ul>
+<h4><span id="112-非法状态">1.1.2. 非法状态</span></h4><p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240427210636856.png" alt="image-20240427210636856"></p>
+<ul>
+<li>对于左图，第一列的状态是 $1,\ 1,\ 0,\ 0$，第二列的状态是 $0,\ 0,\ -1,\ 1$（这里用 $-1$ 表示不摆放），二者做或运算得到的就是合并列的状态，为 $1,\ 1,\ 0,\ 1$，因为第三行没有空间竖放，转换为十进制为 $13$，所以 $13$ 为非法状态</li>
+<li>对于右图，第一列的状态是 $1,\ 1,\ 0,\ 0$，第二列的状态是 $0,\ 0,\ 1,\ -1$（这里用 $-1$ 表示不摆放），二者做或运算得到的就是合并列的状态，为 $1,\ 1,\ 1,\ 0$，因为第四行没有空间竖放，转换为十进制为 $14$，所以 $14$ 为非法状态</li>
+<li>二者都为非法状态，当然非法状态不止这些</li>
+<li>我们可以总结出，只要有连续的奇数个 $0$，就是竖放不了的，此时就是非法状态，除此以外就是合法状态</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 预处理:判断合并列的状态i是否合法</span></span><br><span class="line"><span class="comment">// 如果合并列的某行是1表示横放,是0表示竖放</span></span><br><span class="line"><span class="comment">// 如果合并列不存在连续的奇数个0,即为合法状态</span></span><br><span class="line"><span class="comment">// 这里可以结合md文档来理解</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 枚举状态1~2^n-1,若n=4,有四行,则总状态数为15</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">1</span>&lt;&lt;n;i++) &#123;</span><br><span class="line">    st[i]=<span class="literal">true</span>;</span><br><span class="line">    <span class="type">int</span> cnt=<span class="number">0</span>; <span class="comment">// 连续0的个数</span></span><br><span class="line">    <span class="comment">// 枚举状态二进制表示的每一位,比如13=1101(2)</span></span><br><span class="line">    <span class="comment">// 依次枚举每一位,得到 1 1 0 1,这样就可以处理有多少个连续的0来判断是否合法</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;n;j++) &#123;</span><br><span class="line">        <span class="comment">// 如果这一位是1,紧接着判断连续的0的个数是否是奇数</span></span><br><span class="line">        <span class="keyword">if</span>(i&gt;&gt;j &amp;<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span>(cnt&amp;<span class="number">1</span>) &#123;</span><br><span class="line">                st[i]=<span class="literal">false</span>; <span class="comment">// 这种状态不合法</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 该位是1可以把cnt清0了因为要的是连续的(但其实也可以不清零)</span></span><br><span class="line">			cnt=<span class="number">0</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 如果这位是0,那么cnt++</span></span><br><span class="line">            cnt++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 有可能最后一位是0,此时中间如果隔了个1,比如0100,那么连续的0的个数也出现了奇数</span></span><br><span class="line">    <span class="comment">// 那么也是非法的,处理高位0的个数</span></span><br><span class="line">    <span class="keyword">if</span>(cnt&amp;<span class="number">1</span>) st[i]=<span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 输出每一种状态是否合法或者非法</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;=<span class="number">1</span>&lt;&lt;n;i++) &#123;</span><br><span class="line">    <span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;st[&quot;</span>&lt;&lt;i&lt;&lt;<span class="string">&quot;]=&quot;</span>&lt;&lt;st[i]&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="12-状态计算">1.2. 状态计算</span></h3><ul>
+<li>第一层状态枚举列，第二层状态枚举这一列的状态，第三层枚举上一列的状态，如果两列的状态兼容，则可以转移，何为兼容？</li>
+</ul>
+<ol>
+<li>不出现重叠的 $1$：</li>
+</ol>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240427214132813.png" alt="image-20240427214132813"></p>
+<ul>
+<li>（虽然我觉得这张图的例子不恰当，因为这个状态本来就是非法的，但是也只有这张图了，假设它发生了吧）</li>
+<li>第一列的状态为 ${0,\ 0,\ 0,\ 1}$，第二列的状态为 ${0,\ 0,\ 1,\ 1}$，做且运算的结果是 ${0,\ 0,\ 0,\ 1}$ 不为 $0$，说明出现了重叠的 $1$</li>
+<li><strong>为什么要做与运算？</strong></li>
+<li>做或运算主要是为了检验有没有重叠的横方格，因为每一行上的数字为 $1$ 代表该行上的单元格是伸出的，为 $0$ 代表未伸出，若第 $i-1$ 列为 ${0,\ 0,\ 0,\ 1}$ 就代表第 $i-1$ 列每一行的伸出状态，第 $i$ 列为 ${0,\ 0,\ 1,\ 1}$ 代表第 $i$ 列的伸出状态，做与运算，是对这两列的每一行分别做与运算，如果对于某一行，如果两列都有伸出状态 $(1)$，则合并后也为 $(1)$，此时说明第 $i-1$ 列和第 $i$ 列在某一行上都向下一行伸出，此时横方块就重叠了，不合法！</li>
+</ul>
+<ol start="2">
+<li>不出现连续的奇数个 $0$</li>
+</ol>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240427214448929.png" alt="image-20240427214448929"></p>
+<ul>
+<li>也就是我们预处理的时候预处理过的各种情况</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 状态转移</span></span><br><span class="line"><span class="built_in">memset</span>(f,<span class="number">0</span>,<span class="keyword">sizeof</span> f);</span><br><span class="line">f[<span class="number">0</span>][<span class="number">0</span>]=<span class="number">1</span>; <span class="comment">// 第0列不摆放是一种合法方案</span></span><br><span class="line"><span class="comment">// 1) 枚举列</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=m;i++) &#123;</span><br><span class="line">    <span class="comment">// 2)状态: 枚举第i列的状态</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">1</span>&lt;&lt;n;j++) &#123;</span><br><span class="line">        <span class="comment">// 3) 枚举第i-1列的状态</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> k=<span class="number">0</span>;k&lt;<span class="number">1</span>&lt;&lt;n;k++) &#123;</span><br><span class="line">            <span class="comment">// 两列状态兼容</span></span><br><span class="line">            <span class="comment">// 不出现重叠的1 且 不出现连续的奇数个0(前一列的状态和当前列做或运算)</span></span><br><span class="line">            <span class="keyword">if</span>((j&amp;k)==<span class="number">0</span> &amp;&amp; st[j|k]) &#123;</span><br><span class="line">                f[i][j]+=f[i<span class="number">-1</span>][k]; <span class="comment">// 前一列兼容状态的方案数之和</span></span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;f[%d %d]=%d f[%d %d]=%d\n&quot;</span>,i,j,f[i][j],i<span class="number">-1</span>,k,f[i<span class="number">-1</span>][k]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">cout</span>&lt;&lt;f[m][<span class="number">0</span>]&lt;&lt;<span class="built_in">endl</span>; <span class="comment">// 第m列不横放,即下一列没有突出的,刚好放满,即答案</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="13-完整代码">1.3. 完整代码</span></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">12</span>+<span class="number">5</span>; <span class="comment">// 最大行数</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> M=<span class="number">1</span>&lt;&lt;N; <span class="comment">// 最大状态数</span></span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line"><span class="type">bool</span> st[M]; <span class="comment">// 总状态数</span></span><br><span class="line"><span class="type">int</span> f[N][M]; <span class="comment">// 第i行共k个状态</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="comment">// 同时为0时退出</span></span><br><span class="line">	<span class="keyword">while</span>(<span class="built_in">cin</span>&gt;&gt;n&gt;&gt;m, n||m) &#123;</span><br><span class="line">		<span class="comment">// 预处理:判断合并列的状态i是否合法</span></span><br><span class="line">		<span class="comment">// 如果合并列的某行是1表示横放,是0表示竖放</span></span><br><span class="line">		<span class="comment">// 如果合并列不存在连续的奇数个0,即为合法状态</span></span><br><span class="line">		<span class="comment">// 这里可以结合md文档来理解</span></span><br><span class="line">		</span><br><span class="line">		<span class="comment">// 枚举状态1~2^n-1,若n=4,有四行,则总状态数为15</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">1</span>&lt;&lt;n;i++) &#123;</span><br><span class="line">			st[i]=<span class="literal">true</span>;</span><br><span class="line">			<span class="type">int</span> cnt=<span class="number">0</span>; <span class="comment">// 连续0的个数</span></span><br><span class="line">			<span class="comment">// 枚举状态二进制表示的每一位,比如13=1101(2)</span></span><br><span class="line">			<span class="comment">// 依次枚举每一位,得到 1 1 0 1,这样就可以处理有多少个连续的0来判断是否合法</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;n;j++) &#123;</span><br><span class="line">				<span class="comment">// 如果这一位是1,紧接着判断连续的0的个数是否是奇数</span></span><br><span class="line">				<span class="keyword">if</span>(i&gt;&gt;j &amp;<span class="number">1</span>) &#123;</span><br><span class="line">					<span class="keyword">if</span>(cnt&amp;<span class="number">1</span>) &#123;</span><br><span class="line">						st[i]=<span class="literal">false</span>; <span class="comment">// 这种状态不合法</span></span><br><span class="line">						<span class="keyword">break</span>;</span><br><span class="line">					&#125;</span><br><span class="line">                    <span class="comment">// 该位是1可以把cnt清0了因为要的是连续的(但其实也可以不清零)</span></span><br><span class="line">					cnt=<span class="number">0</span>;</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					<span class="comment">// 如果这位是0,那么cnt++</span></span><br><span class="line">					cnt++;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">// 有可能最后一位是0,此时中间如果隔了个1,比如0100,那么连续的0的个数也出现了奇数</span></span><br><span class="line">			<span class="comment">// 那么也是非法的,处理高位0的个数</span></span><br><span class="line">			<span class="keyword">if</span>(cnt&amp;<span class="number">1</span>) st[i]=<span class="literal">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 输出每一种状态是否合法或者非法</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;=<span class="number">1</span>&lt;&lt;n;i++) &#123;</span><br><span class="line">			<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;st[&quot;</span>&lt;&lt;i&lt;&lt;<span class="string">&quot;]=&quot;</span>&lt;&lt;st[i]&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 状态转移</span></span><br><span class="line">		<span class="built_in">memset</span>(f,<span class="number">0</span>,<span class="keyword">sizeof</span> f);</span><br><span class="line">		f[<span class="number">0</span>][<span class="number">0</span>]=<span class="number">1</span>; <span class="comment">// 第0列不摆放是一种合法方案</span></span><br><span class="line">		<span class="comment">// 1) 枚举列</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=m;i++) &#123;</span><br><span class="line">			<span class="comment">// 2)状态: 枚举第i列的状态</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">1</span>&lt;&lt;n;j++) &#123;</span><br><span class="line">				<span class="comment">// 3) 枚举第i-1列的状态</span></span><br><span class="line">				<span class="keyword">for</span>(<span class="type">int</span> k=<span class="number">0</span>;k&lt;<span class="number">1</span>&lt;&lt;n;k++) &#123;</span><br><span class="line">					<span class="comment">// 两列状态兼容</span></span><br><span class="line">					<span class="comment">// 不出现重叠的1 且 不出现连续的奇数个0(前一列的状态和当前列做或运算)</span></span><br><span class="line">					<span class="keyword">if</span>((j&amp;k)==<span class="number">0</span> &amp;&amp; st[j|k]) &#123;</span><br><span class="line">						f[i][j]+=f[i<span class="number">-1</span>][k]; <span class="comment">// 前一列兼容状态的方案数之和</span></span><br><span class="line">						<span class="built_in">printf</span>(<span class="string">&quot;f[%d %d]=%d f[%d %d]=%d\n&quot;</span>,i,j,f[i][j],i<span class="number">-1</span>,k,f[i<span class="number">-1</span>][k]);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;f[m][<span class="number">0</span>]&lt;&lt;<span class="built_in">endl</span>; <span class="comment">// 第m列不横放,即下一列没有突出的,刚好放满,即答案</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="2-小国王">2. 小国王</span></h2><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1pf4y1q7hU/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E25 状态压缩DP 小国王_bilibili</a><br>题目描述：在 $n×n$ 的棋盘上放 $k$ 个国王，国王可以攻击相邻的 $8$ 个格子，求使他们无法互相攻击的方案总数</p>
+</blockquote>
+<ul>
+<li>比如在一个 $3×3$ 的矩阵中放 $2$ 个国王，一共有 $16$ 种方案</li>
+<li>我们可以用二维数组表示一行上国王的放置情况，比如某一行为 $[1,\ 0,\ 1]$ 就表示第一列和第三列上有国王，但是当 $n$ 偏大时就会浪费掉很多空间甚至 $MLE$，所以将 $[1,\ 0,\ 1]$ 当作二进制数，转换成十进制数 $5$ 来表示状态</li>
+<li>所谓状态压缩即为<ul>
+<li>用二进制表示状态</li>
+<li>用十进制存储状态</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240501224207803.png" alt="image-20240501224207803"></p>
+<h3><span id="21-状态预处理">2.1. 状态预处理</span></h3><ul>
+<li>假设 $n$ 的值就为 $3$，那么对于一个 $3×3$ 的棋盘，每一行的所有状态有 $2^3&#x3D;8$ 种，即 $000,\ 001,\ 010,\ 011,\ 100,\ 101,\ 102,\ 110,\ 111$</li>
+</ul>
+<h4><span id="210-数据结构">2.1.0. 数据结构</span></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">12</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">int</span> n,k; <span class="comment">// 行数,国王个数</span></span><br><span class="line"><span class="type">int</span> cnt; <span class="comment">// 同一行的合法状态个数</span></span><br><span class="line"><span class="type">int</span> s[<span class="number">1</span>&lt;&lt;<span class="number">12</span>]; <span class="comment">// 同一行的合法状态集</span></span><br><span class="line"><span class="type">int</span> num[<span class="number">1</span>&lt;&lt;<span class="number">12</span>]; <span class="comment">// 每个合法状态包含的国王数</span></span><br><span class="line">ll f[<span class="number">12</span>][<span class="number">144</span>][<span class="number">1</span>&lt;&lt;<span class="number">12</span>]; <span class="comment">// 最大12行,国王个数最大12×12,1左移12位表示所有状态最大值</span></span><br><span class="line"><span class="comment">// f[i,j,a]:前i行放了j个国王,第i行第a个状态时的方案</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="211-行内合法">2.1.1. 行内合法</span></h4><ul>
+<li>因为国王会攻击相邻 $8$ 个位置（同一行、同一列、两条对角线的首个元素），所以同一行不能存在两个相邻的 $1$，每行的合法状态只剩：$000,\ 001,\ 010,\ 100,\ 101$</li>
+<li>用位运算 $!(i\ &amp;\ i&gt;&gt;1)$ 实现，即把 $i$ 和右移一位的 $i$ 按位相与，如果两位同为 $1$ 相与之后的结果为 $1$，此时说明存在两个相邻的 $1$</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240501231046905.png" alt="image-20240501231046905"></p>
+<ul>
+<li>代码上每次枚举每一行的所有状态，如果行间不相邻则合法，合法时依次提取这个合法状态的每一位，统计有多少个 $1$，即出现了多少个国王，最后保存到 $s$ 和 $num$ 数组中去</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cin</span>&gt;&gt;n&gt;&gt;k;</span><br><span class="line"><span class="comment">// 预处理</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;(<span class="number">1</span>&lt;&lt;n);i++) &#123;</span><br><span class="line">    <span class="comment">// 枚举一行的所有状态(n个国王,共2^n-1状态)</span></span><br><span class="line">    <span class="keyword">if</span>(!(i&amp;i&gt;&gt;<span class="number">1</span>)) &#123;</span><br><span class="line">        <span class="comment">// 不存在相邻的1,则为合法状态</span></span><br><span class="line">        s[cnt++]=i; <span class="comment">// s即为每一行的合法状态集,这里记录一下,cnt++</span></span><br><span class="line">        <span class="comment">// i为合法状态才进入这个if</span></span><br><span class="line">        <span class="comment">// 每次右移j位(j从0到n-1)就可以取到i的每一位,&amp;1 即可判断1的个数</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;n;j++) </span><br><span class="line">            num[i]+=(i&gt;&gt;j&amp;<span class="number">1</span>); <span class="comment">// 每个合法状态的1的个数,</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="212-行间兼容">2.1.2. 行间兼容</span></h4><ul>
+<li>行内只用考虑行，行间还需要考虑对角线，即对第 $i$ 行考虑 $i-1$ 行的左上角、正上方和右上方三个位置，所以行 $a$ 对行 $b$ 考虑与 $b$ 直接相与（正上方）、右移（左上方）、左移（右上方）按位相与是否出现 $1$（是否相邻）</li>
+<li>在状态计算时进行行间兼容的判断</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240501231306824.png" alt="image-20240501231306824"></p>
+<h3><span id="22-状态计算">2.2. 状态计算</span></h3><ul>
+<li><p>状态表示：$f[i,j,a]$ 表示前 $i$ 行已经放了 $j$ 个国王，第 $i$ 行的第 $a$ 个状态的方案数</p>
+</li>
+<li><p>状态转移：$f[i,j,a]&#x3D;\sum\ f[i-1,j-c[a],b]$ 表示来自上一行 $i-1$ 行，第 $i$ 行已经放了 $a$ 状态时（已经有几个国王）【用前 $i$ 行已经放的国王个数 $j$ 减去第 $i-1$ 行放的国王个数 $c[a]$】，再从上一行中所有的能和 $a$ 状态兼容的状态中累加求和，即是说，我们遍历到第 $i$ 行时，遍历第 $i$ 行的所有自己行内合法的状态，对每一个状态与上一行 $i-1$ 间处理行间兼容，如果兼容则加 $1$，相当于一个累加求和的过程</p>
+</li>
+<li><p>目标值：$ans&#x3D;\sum\ f[n,k,a]$，前 $n$ 行中已经放了 $k$ 个国王，对所有的第 $n$ 行的合法状态进行累加求和</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240501232626218.png" alt="image-20240501232626218"></p>
+<ul>
+<li>代码上</li>
+</ul>
+<ol>
+<li><p>每一行可以不放国王最多 $k$ 个国王，所以枚举国王范围是 $[0,k]$</p>
+</li>
+<li><p>为什么特判 $j&gt;&#x3D;c$ ？控制 $f[i-1][j-c][b]$ 中的下标不为负数，表示可以继续放国王</p>
+</li>
+<li><p>为什么枚举行数要从 $[1,n]$ 呢？因为我们输出的目标值是 $f[n+1][k][0]$ 即遍历到了 $f[n][k][cnt-1]$ 的下一个状态，相当于第 $n+1$ 行什么都不放，两个状态等价，下面两段代码是等价的，好好理解，说实话这里我也没太明白，关于这部分的讲解从视频的 $17:25$ 开始</p>
+</li>
+</ol>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240501235708410.png" alt="image-20240501235708410"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 状态计算</span></span><br><span class="line">f[<span class="number">0</span>][<span class="number">0</span>][<span class="number">0</span>]=<span class="number">1</span>; <span class="comment">// 不放国王是一种方案</span></span><br><span class="line"><span class="comment">// 1) 枚举行</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n+<span class="number">1</span>;i++) &#123;</span><br><span class="line">    <span class="comment">// 2) 枚举国王数</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;=k;j++) &#123;</span><br><span class="line">        <span class="comment">// 3) 枚举第i行的合法状态</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> a=<span class="number">0</span>;a&lt;cnt;a++) &#123;</span><br><span class="line">            <span class="comment">// 4) 枚举第i-1行的合法状态</span></span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> b=<span class="number">0</span>;b&lt;cnt;b++) &#123;</span><br><span class="line">                <span class="type">int</span> c=num[s[a]]; <span class="comment">// 第i行第a个合法状态的国王数</span></span><br><span class="line">                <span class="comment">// 可以继续放国王,不存在同列和斜对角的1</span></span><br><span class="line">                <span class="keyword">if</span>((j&gt;=c) &amp;&amp; !(s[b]&amp;s[a]) &amp;&amp; !(s[b]&amp;(s[a]&lt;&lt;<span class="number">1</span>)) &amp;&amp; !(s[b]&amp;(s[a]&gt;&gt;<span class="number">1</span>))) &#123;</span><br><span class="line">                    f[i][j][a]+=f[i<span class="number">-1</span>][j-c][b]; <span class="comment">// 从第i-1行向第i行转移</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">cout</span>&lt;&lt;f[n+<span class="number">1</span>][k][<span class="number">0</span>]; <span class="comment">// 第n+1行什么都不,只在1~n行放国王</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="23-完整代码">2.3. 完整代码</span></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">12</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">int</span> n,k; <span class="comment">// 行数,国王个数</span></span><br><span class="line"><span class="type">int</span> cnt; <span class="comment">// 同一行的合法状态个数</span></span><br><span class="line"><span class="type">int</span> s[<span class="number">1</span>&lt;&lt;<span class="number">12</span>]; <span class="comment">// 同一行的合法状态集</span></span><br><span class="line"><span class="type">int</span> num[<span class="number">1</span>&lt;&lt;<span class="number">12</span>]; <span class="comment">// 每个合法状态包含的国王数</span></span><br><span class="line">ll f[<span class="number">12</span>][<span class="number">144</span>][<span class="number">1</span>&lt;&lt;<span class="number">12</span>]; <span class="comment">// 最大12行,国王个数最大12×12,1左移12位表示所有状态最大值</span></span><br><span class="line"><span class="comment">// f[i,j,a]:前i行放了j个国王,第i行第a个状态时的方案</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n&gt;&gt;k;</span><br><span class="line">	<span class="comment">// 预处理</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;(<span class="number">1</span>&lt;&lt;n);i++) &#123;</span><br><span class="line">		<span class="comment">// 枚举一行的所有状态(n个国王,共2^n-1状态)</span></span><br><span class="line">		<span class="keyword">if</span>(!(i&amp;i&gt;&gt;<span class="number">1</span>)) &#123;</span><br><span class="line">			<span class="comment">// 不存在相邻的1,则为合法状态</span></span><br><span class="line">			s[cnt++]=i; <span class="comment">// s即为每一行的合法状态集,这里记录一下,cnt++</span></span><br><span class="line">			<span class="comment">// i为合法状态才进入这个if</span></span><br><span class="line">			<span class="comment">// 每次右移j位(j从0到n-1)就可以取到i的每一位,&amp;1 即可判断1的个数</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;n;j++) </span><br><span class="line">				num[i]+=(i&gt;&gt;j&amp;<span class="number">1</span>); <span class="comment">// 每个合法状态的1的个数,</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 状态计算</span></span><br><span class="line">	f[<span class="number">0</span>][<span class="number">0</span>][<span class="number">0</span>]=<span class="number">1</span>; <span class="comment">// 不放国王是一种方案</span></span><br><span class="line">	<span class="comment">// 1) 枚举行</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n+<span class="number">1</span>;i++) &#123;</span><br><span class="line">		<span class="comment">// 2) 枚举国王数</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;=k;j++) &#123;</span><br><span class="line">			<span class="comment">// 3) 枚举第i行的合法状态</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> a=<span class="number">0</span>;a&lt;cnt;a++) &#123;</span><br><span class="line">				<span class="comment">// 4) 枚举第i-1行的合法状态</span></span><br><span class="line">				<span class="keyword">for</span>(<span class="type">int</span> b=<span class="number">0</span>;b&lt;cnt;b++) &#123;</span><br><span class="line">					<span class="type">int</span> c=num[s[a]]; <span class="comment">// 第i行第a个合法状态的国王数</span></span><br><span class="line">					<span class="comment">// 可以继续放国王,不存在同列和斜对角的1</span></span><br><span class="line">					<span class="keyword">if</span>((j&gt;=c) &amp;&amp; !(s[b]&amp;s[a]) &amp;&amp; !(s[b]&amp;(s[a]&lt;&lt;<span class="number">1</span>)) &amp;&amp; !(s[b]&amp;(s[a]&gt;&gt;<span class="number">1</span>))) &#123;</span><br><span class="line">						f[i][j][a]+=f[i<span class="number">-1</span>][j-c][b]; <span class="comment">// 从第i-1行向第i行转移</span></span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;f[n+<span class="number">1</span>][k][<span class="number">0</span>]; <span class="comment">// 第n+1行什么都不,只在1~n行放国王</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="3-玉米田">3. 玉米田</span></h2><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1BA411j7Qv/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E26 状态压缩DP 玉米田_bilibili</a><br>题目描述：玉米田的大小为 $n×m$，相邻土地不能同时种植玉米（种玉米的方格边缘不相交），部分土地不育无法种植玉米，求种植方案总数</p>
+</blockquote>
+<ul>
+<li>比如当玉米田大小为 $2×3$ 时，有下图 $8$ 种种植方案，其中红色的 $0$ 表示不育的土地</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240502123107098.png" alt="image-20240502123107098"></p>
+<ul>
+<li>和上一题类似用二进制表示每一行的状态，再转换为十进制数存储状态，用一维数组存储</li>
+</ul>
+<h3><span id="31-状态预处理">3.1. 状态预处理</span></h3><ul>
+<li>和上一题类似，从行内合法和行内兼容来考虑，本题的“相邻”指的是上下左右四个方向的位置</li>
+</ul>
+<h4><span id="310-数据结构">3.1.0. 数据结构</span></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> Mod=<span class="number">1e9</span>;</span><br><span class="line"><span class="type">int</span> n,m; <span class="comment">// 玉米田行数列数</span></span><br><span class="line"><span class="type">int</span> g[<span class="number">14</span>]; <span class="comment">// 各行的状态值</span></span><br><span class="line"><span class="type">int</span> cnt; <span class="comment">// 同一行的合法状态个数</span></span><br><span class="line"><span class="type">int</span> s[<span class="number">1</span>&lt;&lt;<span class="number">14</span>]; <span class="comment">// 一行的合法状态集</span></span><br><span class="line"><span class="type">int</span> f[<span class="number">14</span>][<span class="number">1</span>&lt;&lt;<span class="number">14</span>];</span><br><span class="line"><span class="comment">// f[i,a]:已种植前i行,第i行第a个状态时的方案数</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="311-行内合法">3.1.1. 行内合法</span></h4><ul>
+<li>若本行状态合法，则一定没有相邻的 $1$</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240502123651504.png" alt="image-20240502123651504"></p>
+<h4><span id="312-行间兼容">3.1.2. 行间兼容</span></h4><ul>
+<li>除了考察正上方的元素，本题相较于小国王多了一个地图，所以需要考察是否能种</li>
+<li>比如第 $i$ 行的地图为 $[1,1,0]$，每一行的合法状态有五个，他们没有相邻的 $1$，分别为：$[0,0,0],\ [0,0,1],\ [0,1,0],\ [1,0,0],\ [1,0,1]$，因为 $[0,0,1],\ [1,0,1]$ 与 $[1,1,0]$ 相与的结果不为本身（即出现了不能种的情况），所以合法状态还剩三个；此时还需要考察与上一行之间是否满足不相邻，比如遍历到 $a$ 行的第 $[0,1,0]$ 状态时，满足与此状态不相邻的有 $[0,0,0],\ [0,0,1],\ [1,0,0],\ [1,0,1]$ 共 $4$ 个</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240502124050540.png" alt="image-20240502124050540"></p>
+<h4><span id="313-代码">3.1.3. 代码</span></h4><ul>
+<li>地图数组 $g$ 存储的是每一行二进制地图状态的十进制表示数，如某一行的状态是 $[1,1,0]$，则十进制状态为 $6$，至于如何用代码实现就是一种技巧了，$g[i]&#x3D;(g[i]&lt;&lt;1)+x$，每次左移 $×2$ 提权随后加上这一位的值 $x$</li>
+<li>保存行内合法的方法与小国王一致，这里不阐释</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cin</span>&gt;&gt;n&gt;&gt;m;</span><br><span class="line"><span class="comment">// 预处理</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=m;j++) &#123;</span><br><span class="line">        <span class="type">int</span> x;<span class="built_in">cin</span>&gt;&gt;x;</span><br><span class="line">        g[i]=(g[i]&lt;&lt;<span class="number">1</span>)+x; <span class="comment">// 保存各行的状态值</span></span><br><span class="line">        <span class="comment">// 模拟跟踪一下,g每次左移+x,得到的是第i行二进制状态的十进制数数值</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;g[%d]=%d\n&quot;</span>,i,g[i]);</span><br><span class="line">    &#125;	</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 枚举一行的所有状态</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;(<span class="number">1</span>&lt;&lt;m);i++) &#123;</span><br><span class="line">    <span class="comment">// 如果不存在相邻的1</span></span><br><span class="line">    <span class="keyword">if</span>(!(i&amp;i&gt;&gt;<span class="number">1</span>)) &#123;</span><br><span class="line">        s[cnt++]=i; <span class="comment">// 保存合法状态的十进制表示数</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="32-状态计算">3.2. 状态计算</span></h3><ul>
+<li>状态表示：$f[i,a]$ 表示已经种植前 $i$ 行，第 $i$ 行第 $a$ 个状态时的方案数</li>
+<li>状态计算：$f[i,a]&#x3D;\sum\ f[i-1,b]$（通过上一行所有的与第 $a$ 行兼容的状态进行累加求和）</li>
+<li>目标值：$ans&#x3D;\sum\ f[n,a]$，即 $f[n+1,0]$</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 状态计算</span></span><br><span class="line">f[<span class="number">0</span>][<span class="number">0</span>]=<span class="number">1</span>; <span class="comment">// 题目说什么都不种是一种状态</span></span><br><span class="line"><span class="comment">// 1) 枚举行技巧</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n+<span class="number">1</span>;i++) &#123;</span><br><span class="line">    <span class="comment">// 2) 枚举第i行合法状态</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> a=<span class="number">0</span>;a&lt;cnt;a++) &#123;</span><br><span class="line">        <span class="comment">// 3) 枚举第i-1行合法状态</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> b=<span class="number">0</span>;b&lt;cnt;b++) &#123;</span><br><span class="line">            <span class="comment">// a种在肥沃土地上,a b同列不同时为1</span></span><br><span class="line">            <span class="keyword">if</span>((s[a]&amp;g[i])==s[a] &amp;&amp; !(s[a]&amp;s[b])) &#123;</span><br><span class="line">                f[i][a]=(f[i][a]+f[i<span class="number">-1</span>][b])%Mod;</span><br><span class="line">                <span class="comment">// 模拟跟踪</span></span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;f[%d %d]=%d f[%d %d]=%d\n&quot;</span>,i,a,f[i][a],i<span class="number">-1</span>,b,f[i<span class="number">-1</span>][b]);</span><br><span class="line">            &#125;	</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">cout</span>&lt;&lt;f[n+<span class="number">1</span>][<span class="number">0</span>]; <span class="comment">// 第n+1行什么都不种</span></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>同时我们可以对状态转移的条件判断做一个加强，我们让 $a,b$ 两行的状态都种在肥沃土地上，上面代码的写法只判断了 $a$ 要种在肥沃土地上，但是上一行 $b$ 的五种合法状态中也可以排除一些与上一行的土地 $g[i-1]$ 相与结果不为本身的，这样转移次数就会变少</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>((s[a]&amp;g[i])==s[a] &amp;&amp; (s[b]&amp;g[i<span class="number">-1</span>])==s[b] &amp;&amp; !(s[a]&amp;s[b])) &#123;</span><br><span class="line">    f[i][a]=(f[i][a]+f[i<span class="number">-1</span>][b])%Mod;</span><br><span class="line">    <span class="comment">// 模拟跟踪</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;f[%d %d]=%d f[%d %d]=%d\n&quot;</span>,i,a,f[i][a],i<span class="number">-1</span>,b,f[i<span class="number">-1</span>][b]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>还可以这样写，过滤掉不合法状态，再累加求和</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 也可以这样写</span></span><br><span class="line"><span class="comment">// 过滤掉 a b 种在不育土地上,a b同列同时为1</span></span><br><span class="line"><span class="keyword">if</span>(s[a]&amp;~g[i] || s[b]&amp;~g[i<span class="number">-1</span>] || s[a]&amp;s[b]) <span class="keyword">continue</span>;</span><br><span class="line">f[i][a]=(f[i][a]+f[i<span class="number">-1</span>][b])%Mod;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="33-完整代码">3.3. 完整代码</span></h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">14</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> Mod=<span class="number">1e9</span>;</span><br><span class="line"><span class="type">int</span> n,m; <span class="comment">// 玉米田行数列数</span></span><br><span class="line"><span class="type">int</span> g[<span class="number">14</span>]; <span class="comment">// 各行的状态值</span></span><br><span class="line"><span class="type">int</span> cnt; <span class="comment">// 同一行的合法状态个数</span></span><br><span class="line"><span class="type">int</span> s[<span class="number">1</span>&lt;&lt;<span class="number">14</span>]; <span class="comment">// 一行的合法状态集</span></span><br><span class="line"><span class="type">int</span> f[<span class="number">14</span>][<span class="number">1</span>&lt;&lt;<span class="number">14</span>];</span><br><span class="line"><span class="comment">// f[i,a]:已种植前i行,第i行第a个状态时的方案数</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n&gt;&gt;m;</span><br><span class="line">	<span class="comment">// 预处理</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=m;j++) &#123;</span><br><span class="line">			<span class="type">int</span> x;<span class="built_in">cin</span>&gt;&gt;x;</span><br><span class="line">			g[i]=(g[i]&lt;&lt;<span class="number">1</span>)+x; <span class="comment">// 保存各行的状态值</span></span><br><span class="line">			<span class="comment">// 模拟跟踪一下,g每次左移+x,得到的是第i行二进制状态的十进制数数值</span></span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;g[%d]=%d\n&quot;</span>,i,g[i]);</span><br><span class="line">		&#125;	</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 枚举一行的所有状态</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;(<span class="number">1</span>&lt;&lt;m);i++) &#123;</span><br><span class="line">		<span class="comment">// 如果不存在相邻的1</span></span><br><span class="line">		<span class="keyword">if</span>(!(i&amp;i&gt;&gt;<span class="number">1</span>)) &#123;</span><br><span class="line">			s[cnt++]=i; <span class="comment">// 保存合法状态的十进制表示数</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 状态计算</span></span><br><span class="line">	f[<span class="number">0</span>][<span class="number">0</span>]=<span class="number">1</span>; <span class="comment">// 题目说什么都不种是一种状态</span></span><br><span class="line">	<span class="comment">// 1) 枚举行技巧</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n+<span class="number">1</span>;i++) &#123;</span><br><span class="line">		<span class="comment">// 2) 枚举第i行合法状态</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> a=<span class="number">0</span>;a&lt;cnt;a++) &#123;</span><br><span class="line">			<span class="comment">// 3) 枚举第i-1行合法状态</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> b=<span class="number">0</span>;b&lt;cnt;b++) &#123;</span><br><span class="line">				<span class="comment">// a种在肥沃土地上,a b同列不同时为1</span></span><br><span class="line">				<span class="keyword">if</span>((s[a]&amp;g[i])==s[a] &amp;&amp; !(s[a]&amp;s[b])) &#123;</span><br><span class="line">					f[i][a]=(f[i][a]+f[i<span class="number">-1</span>][b])%Mod;</span><br><span class="line">					<span class="comment">// 模拟跟踪</span></span><br><span class="line">					<span class="built_in">printf</span>(<span class="string">&quot;f[%d %d]=%d f[%d %d]=%d\n&quot;</span>,i,a,f[i][a],i<span class="number">-1</span>,b,f[i<span class="number">-1</span>][b]);</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="comment">// 状态转移增强,让上一行b也必须种在肥沃土地上</span></span><br><span class="line"><span class="comment">//				if((s[a]&amp;g[i])==s[a] &amp;&amp; (s[b]&amp;g[i-1])==s[b] &amp;&amp; !(s[a]&amp;s[b])) &#123;</span></span><br><span class="line"><span class="comment">//					f[i][a]=(f[i][a]+f[i-1][b])%Mod;</span></span><br><span class="line"><span class="comment">//					// 模拟跟踪</span></span><br><span class="line"><span class="comment">//					printf(&quot;f[%d %d]=%d f[%d %d]=%d\n&quot;,i,a,f[i][a],i-1,b,f[i-1][b]);</span></span><br><span class="line"><span class="comment">//				&#125;</span></span><br><span class="line">				<span class="comment">// 也可以这样写</span></span><br><span class="line">				<span class="comment">// 过滤掉 a b 种在不育土地上,a b同列同时为1</span></span><br><span class="line"><span class="comment">//				if(s[a]&amp;~g[i] || s[b]&amp;~g[i-1] || s[a]&amp;s[b]) continue;</span></span><br><span class="line"><span class="comment">//				f[i][a]=(f[i][a]+f[i-1][b])%Mod;</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;f[n+<span class="number">1</span>][<span class="number">0</span>]; <span class="comment">// 第n+1行什么都不种</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">输入样例:</span></span><br><span class="line"><span class="comment">2 3</span></span><br><span class="line"><span class="comment">1 1 0</span></span><br><span class="line"><span class="comment">0 1 1</span></span><br><span class="line"><span class="comment">输出样例:</span></span><br><span class="line"><span class="comment">8</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="4-炮兵阵地">4. 炮兵阵地</span></h2><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1vy4y1z7qy/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E27 状态压缩DP 炮兵部队_bilibili</a><br>题目描述：$n×m$ 的网格地图由平原和山地构成，炮兵只能放在平原，放在平原后攻击范围为横向左右各两格、纵向上下各两格，攻击范围不受地形影响，现在问在保证任意两支炮兵不互相攻击的前提下，在整个地图区域<strong>最多能</strong>摆放多少炮兵部队？</p>
+</blockquote>
+<ul>
+<li><p>和玉米田一样的是，不是所有的方格都能放，那么区别在哪里？</p>
+<ul>
+<li>横向和纵向上分别延申了两格，那么行内兼容和行间兼容的条件都会发生变化</li>
+<li>求的是最多能摆放多少部队，而不是总方案数</li>
+</ul>
+</li>
+<li><p>同样的把每一行的地图用二进制表示，十进制存储，如 $PHHP→1001→9$（$P$ 表示平原，$H$ 表示山地）</p>
+</li>
+</ul>
+<h3><span id="41-状态预处理">4.1. 状态预处理</span></h3><ul>
+<li>横向和纵向上分别延申两格</li>
+</ul>
+<h4><span id="410-数据结构">4.1.0. 数据结构</span></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">110</span>; <span class="comment">// 最大行数</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> M=<span class="number">1</span>&lt;&lt;<span class="number">10</span>; <span class="comment">// 列数最大为10,则状态最大有2^10-1</span></span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line"><span class="type">int</span> g[N]; <span class="comment">// 地图各行十进制表示数值</span></span><br><span class="line"><span class="type">int</span> cnt; <span class="comment">// 每行合法状态个数</span></span><br><span class="line"><span class="type">int</span> s[M]; <span class="comment">// 同一行的合法状态集个数</span></span><br><span class="line"><span class="type">int</span> num[M]; <span class="comment">// 每个合法状态包含1的个数</span></span><br><span class="line"><span class="type">int</span> f[N][M][M]; <span class="comment">// 110*1024*1024*4=440MB(int型4字节)</span></span><br><span class="line"><span class="comment">// f[i][a][b]:已放好前i行,第i行第a个状态,第i-1行第b个状态时能放置的最大数量</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="411-行内合法">4.1.1. 行内合法</span></h4><ul>
+<li>若列数 $m&#x3D;4$，则一行的所有状态有：$[0000,1111]$ 共 $15$ 个状态，合法即：不出现相邻的 $1$ 或不出现 $101$</li>
+<li>判断条件：$if(!(i&amp;i&gt;&gt;1)\ &amp;&amp;\ !(i&amp;i&gt;&gt;2))$ 为$true$，则 $i$ 合法<ul>
+<li>若 $i&#x3D;3,\ 0011$，$i&gt;&gt;1\ &#x3D;\ 0001$，$0011&amp;0001&#x3D;0001$，取反为 $false$，所以 $i&#x3D;3$ 不合法</li>
+<li>若 $i&#x3D;5,\ 0101$，$i&gt;&gt;2\ &#x3D;\ 0001$，$0101&amp;0001&#x3D;0001$，取反为 $false$，所以 $i&#x3D;5$ 不合法</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240503101107406.png" alt="image-20240503101107406"></p>
+<h4><span id="412-行间兼容">4.1.2. 行间兼容</span></h4><ul>
+<li>现在用 $a$ 表示当前行，用 $b$ 表示上一行，用 $c$ 表示上上行，那么每遍历一个 $a$ 的合法状态并且 $a$ 与地图适配，$1$ 出现的位置都在平原上，那么再而去遍历 $b$ 的合法状态且不与 $a$ 有同列的冲突，确定好 $b$ 后再而去确定 $c$ 的状态，同理 $c$ 也不能和 $a$、$b$ 有同列冲突，这样就判定了一个合法状态</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240503101731400.png" alt="image-20240503101731400"></p>
+<h4><span id="413-代码">4.1.3. 代码</span></h4><ul>
+<li>需要学习的技巧在于<ul>
+<li>若输入的地图是字符类型的，如何把其当成二进制数并转换成十进制数存储起来</li>
+<li>考察相邻的 $11$ 的代码是 $!(i&amp;i&gt;&gt;1)$，考察 $101$ 的代码是 $!(i&amp;i&gt;&gt;2)$</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cin</span>&gt;&gt;n&gt;&gt;m;</span><br><span class="line"><span class="comment">// 预处理地图</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;m;j++) &#123;</span><br><span class="line">        <span class="type">char</span> c;<span class="built_in">cin</span>&gt;&gt;c;</span><br><span class="line">        <span class="comment">// 这个技巧很重要,如果是平原(即1)需要转换成二进制</span></span><br><span class="line">        <span class="comment">// m-j-1 是1需要偏移的长度,即出现在第几位,转换成二进制是多少</span></span><br><span class="line">        <span class="keyword">if</span>(c==<span class="string">&#x27;P&#x27;</span>) g[i]+=<span class="number">1</span>&lt;&lt;(m-j<span class="number">-1</span>); <span class="comment">// 保存地图各行数值</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;g[%d]=%d\n&quot;</span>,i,g[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 预处理合法状态和1的个数</span></span><br><span class="line"><span class="comment">// 枚举一行的所有状态</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;(<span class="number">1</span>&lt;&lt;m);i++) &#123;</span><br><span class="line">    <span class="comment">// 如果不存在11或101</span></span><br><span class="line">    <span class="keyword">if</span>(!(i&amp;i&gt;&gt;<span class="number">1</span>) &amp;&amp; !(i&amp;i&gt;&gt;<span class="number">2</span>)) &#123;</span><br><span class="line">        s[cnt++]=i; <span class="comment">// 保存这个合法状态</span></span><br><span class="line">        <span class="comment">// 统计这个合法状态包含1的个数,存进num</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;m;j++) &#123;</span><br><span class="line">            num[i]+=(i&gt;&gt;j&amp;<span class="number">1</span>); <span class="comment">// j&amp;1说明i偏移j位后末尾是1</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 打印所有合法状态看看</span></span><br><span class="line"><span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;输出合法状态:&gt;&quot;</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;cnt;i++) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;s[%d]=%d num[%d]=%d\n&quot;</span>,i,s[i],i,num[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="42-状态计算">4.2. 状态计算</span></h3><ul>
+<li><p>状态表示：$f[i,a,b]$ 表示已摆放前 $i$ 行，当前第 $i$ 行的状态为 $a$，并且第 $i-1$ 行的状态为 $b$ 时能摆放的最大数量（比玉米田多了一维来锁定第 $i-1$ 行的状态，注意这里不是方案数！）【为什么不再来一维表示第 $i-2$ 行的状态？因为状态转移时，$f[i,a,b]$ 是由 $f[i-1,b,c]$ 转移来的，即状态 $i$ 的上一行是状态 $i-1$ 的本行，在循环计算时 $c$ 也包含在内了】</p>
+</li>
+<li><p>状态转移：$f[i,a,b]&#x3D;max(f[i,a,b],f[i-1,b,c]+num[a])$ 是由上一个状态的最大数量加上当前行第 $a$ 行所能摆放炮兵的数量转移得到</p>
+</li>
+<li><p>边界初值：$f[]&#x3D;0$</p>
+</li>
+<li><p>目标值：$ans&#x3D;max(f[n,a,b])$，即 $f[n+2,0,0]$（多算两行，最后两行什么都不放）或从 摆放了前 $n$ 的各个状态中遍历求得最大值</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 状态计算</span></span><br><span class="line"><span class="comment">// 1) 枚举行,多算两行,技巧同上</span></span><br><span class="line"><span class="comment">// 直接输出f[n+2][0][0] 这样就不用枚举最后一行n的所有合法状态挑出最大值</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n+<span class="number">2</span>;i++) &#123;</span><br><span class="line">    <span class="comment">// 2) 枚举第i行合法状态</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> a=<span class="number">0</span>;a&lt;cnt;a++) &#123;</span><br><span class="line">        <span class="comment">// 3) 枚举第i-1行合法状态</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> b=<span class="number">0</span>;b&lt;cnt;b++) &#123;</span><br><span class="line">            <span class="comment">// 4) 枚举第i-2行合法状态</span></span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;cnt;c++) &#123;</span><br><span class="line">                <span class="comment">// 状态转移的条件</span></span><br><span class="line">                <span class="keyword">if</span>(!(s[a]&amp;s[b]) &amp;&amp; !(s[a]&amp;s[c]) &amp;&amp; !(s[b]&amp;s[c]) <span class="comment">// 任意两行不同列 </span></span><br><span class="line">                   &amp;&amp; (g[i]&amp;s[a])==s[a] &amp;&amp; (g[i<span class="number">-1</span>]&amp;s[b])==s[b]) <span class="comment">// 地图适配a,地图适配b</span></span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// s[a]: 状态a的十进制表示,num[s[a]]: 取出本行状态为a时这一行的炮兵个数</span></span><br><span class="line">                    f[i][a][b]=max(f[i][a][b],f[i<span class="number">-1</span>][b][c]+num[s[a]]);</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 模拟跟踪状态转移过程</span></span><br><span class="line">                    <span class="built_in">printf</span>(<span class="string">&quot;f[%d %d %d]=%d 由上一行 f[%d %d %d]=%d 加上本行炮兵个数 %d 转移而来\n&quot;</span>,</span><br><span class="line">                           i,a,b,f[i][a][b],i<span class="number">-1</span>,b,c,f[i<span class="number">-1</span>][b][c],num[s[a]]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">cout</span>&lt;&lt;f[n+<span class="number">2</span>][<span class="number">0</span>][<span class="number">0</span>]&lt;&lt;<span class="built_in">endl</span>; <span class="comment">// 等价于枚举第n行a/b所有状态遍历得到的最大值 </span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="43-完整代码">4.3. 完整代码</span></h3><blockquote>
+<p>模拟跟踪过程从视频 $17:35$ 开始</p>
+</blockquote>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240503114304814.png" alt="image-20240503114304814"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">110</span>; <span class="comment">// 最大行数</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> M=<span class="number">1</span>&lt;&lt;<span class="number">10</span>; <span class="comment">// 列数最大为10,则状态最大有2^10-1</span></span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line"><span class="type">int</span> g[N]; <span class="comment">// 地图各行十进制表示数值</span></span><br><span class="line"><span class="type">int</span> cnt; <span class="comment">// 每行合法状态个数</span></span><br><span class="line"><span class="type">int</span> s[M]; <span class="comment">// 同一行的合法状态集个数</span></span><br><span class="line"><span class="type">int</span> num[M]; <span class="comment">// 每个合法状态包含1的个数</span></span><br><span class="line"><span class="type">int</span> f[N][M][M]; <span class="comment">// 110*1024*1024*4=440MB(int型4字节)</span></span><br><span class="line"><span class="comment">// f[i][a][b]:已放好前i行,第i行第a个状态,第i-1行第b个状态时能放置的最大数量</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n&gt;&gt;m;</span><br><span class="line">	<span class="comment">// 预处理地图</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;m;j++) &#123;</span><br><span class="line">			<span class="type">char</span> c;<span class="built_in">cin</span>&gt;&gt;c;</span><br><span class="line">			<span class="comment">// 这个技巧很重要,如果是平原(即1)需要转换成二进制</span></span><br><span class="line">			<span class="comment">// m-j-1 是1需要偏移的长度,即出现在第几位,转换成二进制是多少</span></span><br><span class="line">			<span class="keyword">if</span>(c==<span class="string">&#x27;P&#x27;</span>) g[i]+=<span class="number">1</span>&lt;&lt;(m-j<span class="number">-1</span>); <span class="comment">// 保存地图各行数值</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;g[%d]=%d\n&quot;</span>,i,g[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 预处理合法状态和1的个数</span></span><br><span class="line">	<span class="comment">// 枚举一行的所有状态</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;(<span class="number">1</span>&lt;&lt;m);i++) &#123;</span><br><span class="line">		<span class="comment">// 如果不存在11或101</span></span><br><span class="line">		<span class="keyword">if</span>(!(i&amp;i&gt;&gt;<span class="number">1</span>) &amp;&amp; !(i&amp;i&gt;&gt;<span class="number">2</span>)) &#123;</span><br><span class="line">			s[cnt++]=i; <span class="comment">// 保存这个合法状态</span></span><br><span class="line">			<span class="comment">// 统计这个合法状态包含1的个数,存进num</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;m;j++) &#123;</span><br><span class="line">				num[i]+=(i&gt;&gt;j&amp;<span class="number">1</span>); <span class="comment">// j&amp;1说明i偏移j位后末尾是1</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 打印所有合法状态看看</span></span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;输出合法状态:&gt;&quot;</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;cnt;i++) &#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;s[%d]=%d num[%d]=%d\n&quot;</span>,i,s[i],i,num[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 状态计算</span></span><br><span class="line">	<span class="comment">// 1) 枚举行,多算两行,技巧同上</span></span><br><span class="line">	<span class="comment">// 直接输出f[n+2][0][0] 这样就不用枚举最后一行n的所有合法状态挑出最大值</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n+<span class="number">2</span>;i++) &#123;</span><br><span class="line">		<span class="comment">// 2) 枚举第i行合法状态</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> a=<span class="number">0</span>;a&lt;cnt;a++) &#123;</span><br><span class="line">			<span class="comment">// 3) 枚举第i-1行合法状态</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> b=<span class="number">0</span>;b&lt;cnt;b++) &#123;</span><br><span class="line">				<span class="comment">// 4) 枚举第i-2行合法状态</span></span><br><span class="line">				<span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;cnt;c++) &#123;</span><br><span class="line">					<span class="comment">// 状态转移的条件</span></span><br><span class="line">					<span class="keyword">if</span>(!(s[a]&amp;s[b]) &amp;&amp; !(s[a]&amp;s[c]) &amp;&amp; !(s[b]&amp;s[c]) <span class="comment">// 任意两行不同列 </span></span><br><span class="line">						&amp;&amp; (g[i]&amp;s[a])==s[a] &amp;&amp; (g[i<span class="number">-1</span>]&amp;s[b])==s[b]) <span class="comment">// 地图适配a,地图适配b</span></span><br><span class="line">					&#123;</span><br><span class="line">						<span class="comment">// s[a]: 状态a的十进制表示,num[s[a]]: 取出本行状态为a时这一行的炮兵个数</span></span><br><span class="line">						f[i][a][b]=max(f[i][a][b],f[i<span class="number">-1</span>][b][c]+num[s[a]]);</span><br><span class="line">						</span><br><span class="line">						<span class="comment">// 模拟跟踪状态转移过程</span></span><br><span class="line">						<span class="built_in">printf</span>(<span class="string">&quot;f[%d %d %d]=%d 由上一行 f[%d %d %d]=%d 加上本行炮兵个数 %d 转移而来\n&quot;</span>,</span><br><span class="line">							i,a,b,f[i][a][b],i<span class="number">-1</span>,b,c,f[i<span class="number">-1</span>][b][c],num[s[a]]);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;f[n+<span class="number">2</span>][<span class="number">0</span>][<span class="number">0</span>]&lt;&lt;<span class="built_in">endl</span>; <span class="comment">// 等价于枚举第n行a/b所有状态遍历得到的最大值 </span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">输入样例:</span></span><br><span class="line"><span class="comment">3 4</span></span><br><span class="line"><span class="comment">PHHP</span></span><br><span class="line"><span class="comment">HPHP</span></span><br><span class="line"><span class="comment">HHPH</span></span><br><span class="line"><span class="comment">输出样例:</span></span><br><span class="line"><span class="comment">4</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="44-延申-滚动数组优化">4.4. 延申-滚动数组优化</span></h3><ul>
+<li>在上述代码中 $f$ 数组是三维的，共占空间 $440MB$，如果题目限制为 $64MB$，那么肯定会 $MLE$，所以考虑如何压缩空间</li>
+<li>可以用滚动数组优化，因为状态转移时，第 $i$ 行只与第 $i-1$ 行有关，所以第一维可以只开 $2$ 个空间</li>
+</ul>
+<h4><span id="441-数据结构">4.4.1. 数据结构</span></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">110</span>; <span class="comment">// 最大行数</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> M=<span class="number">1</span>&lt;&lt;<span class="number">10</span>; <span class="comment">// 列数最大为10,则状态最大有2^10-1</span></span><br><span class="line"><span class="type">int</span> n,m;</span><br><span class="line"><span class="type">int</span> g[N]; <span class="comment">// 地图各行十进制表示数值</span></span><br><span class="line"><span class="type">int</span> cnt; <span class="comment">// 每行合法状态个数</span></span><br><span class="line"><span class="type">int</span> s[M]; <span class="comment">// 同一行的合法状态集个数</span></span><br><span class="line"><span class="type">int</span> num[M]; <span class="comment">// 每个合法状态包含1的个数</span></span><br><span class="line"><span class="type">int</span> f[<span class="number">2</span>][M][M]; <span class="comment">// 2*1024*1024*4=8MB(int型4字节)</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="442-状态计算部分修改">4.4.2. 状态计算部分修改</span></h4><ul>
+<li>因为第一维空间只有 $2$ 了，所以每次使用第一维空间时要模 $2$，也可以通过位运算的方式，使用 $&amp;1$ 达到模 $2$ 的效果</li>
+<li>另外，对于 $i-1&amp;1$ 的运算顺序是 $i-1$ 后再 $&amp;1$ ，位运算的优先级通常较低</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1) 计算的次数不变</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n+<span class="number">2</span>;i++) &#123;</span><br><span class="line">    <span class="comment">// 2) 枚举第i行合法状态</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> a=<span class="number">0</span>;a&lt;cnt;a++) &#123;</span><br><span class="line">        <span class="comment">// 3) 枚举第i-1行合法状态</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> b=<span class="number">0</span>;b&lt;cnt;b++) &#123;</span><br><span class="line">            <span class="comment">// 4) 枚举第i-2行合法状态</span></span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;cnt;c++) &#123;</span><br><span class="line">                <span class="comment">// 状态转移的条件</span></span><br><span class="line">                <span class="keyword">if</span>(!(s[a]&amp;s[b]) &amp;&amp; !(s[a]&amp;s[c]) &amp;&amp; !(s[b]&amp;s[c]) <span class="comment">// 任意两行不同列 </span></span><br><span class="line">                   &amp;&amp; (g[i]&amp;s[a])==s[a] &amp;&amp; (g[i<span class="number">-1</span>]&amp;s[b])==s[b]) <span class="comment">// 地图适配a,地图适配b</span></span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// s[a]: 状态a的十进制表示,num[s[a]]: 取出本行状态为a时这一行的炮兵个数</span></span><br><span class="line">                    f[i&amp;<span class="number">1</span>][a][b]=max(f[i&amp;<span class="number">1</span>][a][b],f[i<span class="number">-1</span>&amp;<span class="number">1</span>][b][c]+num[s[a]]);</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 模拟跟踪状态转移过程</span></span><br><span class="line">                    <span class="built_in">printf</span>(<span class="string">&quot;f[%d %d %d]=%d 由上一行 f[%d %d %d]=%d 加上本行炮兵个数 %d 转移而来\n&quot;</span>,</span><br><span class="line">                           i&amp;<span class="number">1</span>,a,b,f[i&amp;<span class="number">1</span>][a][b],i<span class="number">-1</span>&amp;<span class="number">1</span>,b,c,f[i<span class="number">-1</span>&amp;<span class="number">1</span>][b][c],num[s[a]]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">cout</span>&lt;&lt;f[n+<span class="number">2</span>&amp;<span class="number">1</span>][<span class="number">0</span>][<span class="number">0</span>]&lt;&lt;<span class="built_in">endl</span>; <span class="comment">// 等价于枚举第n行a/b所有状态遍历得到的最大值 </span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4><span id="443-完整代码">4.4.3. 完整代码</span></h4><blockquote>
+<p>这里直接引用董晓老师的代码了</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstring&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span></span></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">110</span>, M=<span class="number">1</span>&lt;&lt;<span class="number">10</span>;</span><br><span class="line"><span class="type">int</span> n,m;    <span class="comment">//行数,列数 </span></span><br><span class="line"><span class="type">int</span> g[N];   <span class="comment">//存储地图各行数值</span></span><br><span class="line"><span class="type">int</span> cnt;    <span class="comment">//一行的合法状态个数</span></span><br><span class="line"><span class="type">int</span> s[M];   <span class="comment">//一行的合法状态集 </span></span><br><span class="line"><span class="type">int</span> num[M]; <span class="comment">//每个合法状态包含1的个数 </span></span><br><span class="line"><span class="type">int</span> f[<span class="number">2</span>][M][M]; <span class="comment">//滚动数组 2*1024*1024*4 = 8MB</span></span><br><span class="line"><span class="comment">// f[i][a][b]表示已放好前i行，</span></span><br><span class="line"><span class="comment">// 第i行第a个状态，第i-1行第b个状态时，能放置的最大数量 </span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">  <span class="built_in">cin</span>&gt;&gt;n&gt;&gt;m;</span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++)</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;m;j++)&#123;</span><br><span class="line">      <span class="type">char</span> c; <span class="built_in">cin</span>&gt;&gt;c; </span><br><span class="line">      <span class="keyword">if</span>(c==<span class="string">&#x27;P&#x27;</span>) g[i]+=<span class="number">1</span>&lt;&lt;(m-j<span class="number">-1</span>); <span class="comment">//地图各行数值          </span></span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;(<span class="number">1</span>&lt;&lt;m); i++)   <span class="comment">//枚举一行的所有状态 </span></span><br><span class="line">    <span class="keyword">if</span>(!(i&amp;i&gt;&gt;<span class="number">1</span>) &amp;&amp; !(i&amp;i&gt;&gt;<span class="number">2</span>))&#123; <span class="comment">//如果不存在11和101 </span></span><br><span class="line">      s[cnt++]=i;               <span class="comment">//保存一行的合法状态</span></span><br><span class="line">      <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>; j&lt;m; j++)</span><br><span class="line">      	num[i]+=(i&gt;&gt;j&amp;<span class="number">1</span>);         <span class="comment">//每个合法状态包含1的个数</span></span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>; i&lt;=n+<span class="number">2</span>; i++) <span class="comment">//枚举行</span></span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> a=<span class="number">0</span>; a&lt;cnt; a++)  <span class="comment">//枚举第i行合法状态</span></span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> b=<span class="number">0</span>; b&lt;cnt; b++)  <span class="comment">//枚举第i-1行合法状态</span></span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>; c&lt;cnt; c++)  <span class="comment">//枚举第i-2行合法状态</span></span><br><span class="line">    <span class="keyword">if</span>(!(s[a]&amp;s[b])&amp;&amp;!(s[a]&amp;s[c])&amp;&amp;!(s[b]&amp;s[c])</span><br><span class="line">      &amp;&amp;(g[i]&amp;s[a])==s[a]&amp;&amp;(g[i<span class="number">-1</span>]&amp;s[b])==s[b])</span><br><span class="line">        f[i&amp;<span class="number">1</span>][a][b]=max(f[i&amp;<span class="number">1</span>][a][b],f[i<span class="number">-1</span>&amp;<span class="number">1</span>][b][c]+num[s[a]]);</span><br><span class="line">      </span><br><span class="line">  <span class="built_in">cout</span>&lt;&lt;f[n+<span class="number">2</span>&amp;<span class="number">1</span>][<span class="number">0</span>][<span class="number">0</span>]&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2024/11/07/%E7%8A%B6%E5%8E%8BDP/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2024/11/07/%E6%95%B0%E4%BD%8DDP/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            数位DP
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2024/11/07/%E6%A0%91%E5%BD%A2DP/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">树形DP</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.staticfile.org/valine/1.4.16/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "92B90kPxtBbndNGuCdYouFEO-gzGzoHsz",
+    app_key: "GnHcvbn2eo3Vvqi6x4X90ogH",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2024
+        <i class="ri-heart-fill heart_icon"></i> John Doe
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-sea-side.svg" alt="漂至"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2106426315&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<!-- hexo injector body_end start --><script data-pjax src="https://unpkg.com/oh-my-live2d"></script><script>const oml2d = OML2D.loadOml2d({dockedPosition:"left",mobileDisplay:true,models:[{"path":"https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json","scale":0.12,"position":[0,0],"stageStyle":{"width":250},"mobileScale":0.08,"mobilePosition":[0,0],"mobileStageStyle":{"width":180}}],parentElement:document.body,primaryColor:"var(--btn-bg)",sayHello:false,tips:{style: {"width":230,"height":120,"left":"calc(50% - 20px)","top":"-100px"},mobileStyle: {"width":180,"height":80,"left":"calc(50% - 30px)","top":"-100px"},idleTips:{interval:15000,message:function(){
+  return axios.get('https://v1.hitokoto.cn?c=i')
+    .then(function (response) {
+      return response.data.hitokoto ;
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+}}});</script><!-- hexo injector body_end end --></body>
+
+</html>

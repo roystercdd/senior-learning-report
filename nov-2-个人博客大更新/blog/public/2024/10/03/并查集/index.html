@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="生活,思考,代码,博客,摄影" />
+       
+      <meta name="description" content="欢迎光临CDD的个人网站~~~" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>并查集 |  漂至</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/deadpool.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="漂至" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-并查集"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  并查集
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2024/10/03/%E5%B9%B6%E6%9F%A5%E9%9B%86/" class="article-date">
+  <time datetime="2024-10-03T04:51:46.000Z" itemprop="datePublished">2024-10-03</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">1.5k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">6 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <meta name="referrer" content="no-referrer">
+
+<h1><span id="并查集">并查集</span></h1><!-- toc -->
+
+<ul>
+<li><a href="#0-%E6%A6%82%E8%BF%B0">0. 概述</a></li>
+<li><a href="#1-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84">1. 数据结构</a></li>
+<li><a href="#2-%E6%A0%B8%E5%BF%83%E5%87%BD%E6%95%B0">2. 核心函数</a><ul>
+<li><a href="#21-find%E5%87%BD%E6%95%B0">2.1. find函数</a></li>
+<li><a href="#22-join%E5%87%BD%E6%95%B0">2.2. join函数</a></li>
+</ul>
+</li>
+<li><a href="#3-%E6%A8%A1%E6%9D%BF">3. 模板</a></li>
+<li><a href="#4-%E7%BB%B4%E6%8A%A4%E4%BF%A1%E6%81%AF%E7%9A%84%E5%B9%B6%E6%9F%A5%E9%9B%86">4. 维护信息的并查集</a><ul>
+<li><a href="#41-%E7%BB%B4%E6%8A%A4%E5%90%84%E9%9B%86%E5%90%88%E4%B8%AD%E5%85%83%E7%B4%A0%E6%80%BB%E6%95%B0">4.1. 维护各集合中元素总数</a></li>
+<li><a href="#42-%E7%BB%B4%E6%8A%A4%E6%80%BB%E9%9B%86%E5%90%88%E4%B8%AA%E6%95%B0">4.2. 维护总集合个数</a></li>
+</ul>
+</li>
+<li><a href="#5-%E5%AE%8C%E5%A4%87%E5%B9%B6%E6%9F%A5%E9%9B%86">5. 完备并查集</a></li>
+</ul>
+<!-- tocstop -->
+
+<span id="more"></span>
+
+
+
+<h2><span id="0-概述">0. 概述</span></h2><ul>
+<li>并查集是用于处理不相交集合的合并与查询的树形数据结构</li>
+</ul>
+<h2><span id="1-数据结构">1. 数据结构</span></h2><ul>
+<li>准备一个数组用于存储所有点的连通分量（父节点）</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> maxn=<span class="number">2e5</span><span class="number">+5</span>;</span><br><span class="line"><span class="type">int</span> fa[maxn];</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="2-核心函数">2. 核心函数</span></h2><h3><span id="21-find函数">2.1. find函数</span></h3><ul>
+<li>用于查询某个元素的父节点</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 查找元素所在集合的根</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">find</span><span class="params">(<span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 根节点</span></span><br><span class="line">	<span class="keyword">if</span>(x==fa[x]) <span class="keyword">return</span> x;</span><br><span class="line"><span class="comment">//	return find(fa[x]); // 递归查找父节点的父节点</span></span><br><span class="line">	<span class="comment">// 带路径压缩的查找(有效降低递归的时间复杂度)</span></span><br><span class="line">	<span class="comment">// 在返回的路上,顺带修改各节点的父节点为根</span></span><br><span class="line">	<span class="comment">// 这句代码的意思是:fa[x]=find(fa[x]),return fa[x]</span></span><br><span class="line">	<span class="keyword">return</span> fa[x]=<span class="built_in">find</span>(fa[x]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/202410031254549.png" alt="image-20240410144829099"></p>
+<ul>
+<li>带路径压缩的查找和普通查找的区别仅仅在于在递归的过程中把每个子节点的父节点更新为根</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/202410031253600.png" alt="image-20240410144851687"></p>
+<h3><span id="22-join函数">2.2. join函数</span></h3><ul>
+<li>用于连接两个并查集</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">join</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// b的根作为a的根</span></span><br><span class="line">    fa[<span class="built_in">find</span>(a)]=<span class="built_in">find</span>(b); <span class="comment">// b的父节点作为a原本的父节点的父节点</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="3-模板">3. 模板</span></h2><blockquote>
+<p>题目链接：<a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P3367">P3367 【模板】并查集 - 洛谷</a></p>
+</blockquote>
+<ul>
+<li>1）初始化时将每个节点的父节点初始化为自己</li>
+<li>2）如果 $a$ 和 $b$ 的根相同，则表明二者处于同一并查集中</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> maxn=<span class="number">1e4</span><span class="number">+4</span>;</span><br><span class="line"><span class="type">int</span> fa[maxn]; <span class="comment">// 记录每个节点的父节点</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">find</span><span class="params">(<span class="type">int</span> x)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(x==fa[x]) </span><br><span class="line">		<span class="keyword">return</span> x;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		<span class="comment">// 路径压缩</span></span><br><span class="line">		<span class="keyword">return</span> fa[x]=<span class="built_in">find</span>(fa[x]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">join</span><span class="params">(<span class="type">int</span> l,<span class="type">int</span> r)</span> </span>&#123;</span><br><span class="line">	fa[<span class="built_in">find</span>(l)]=<span class="built_in">find</span>(r); <span class="comment">// x的父节点的父节点变为y的父节点(合并)</span></span><br><span class="line">    <span class="comment">// 即把l的集合的根节点的父亲设置为r集合的根节点</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="type">int</span> n,m;</span><br><span class="line">	cin&gt;&gt;n&gt;&gt;m;</span><br><span class="line">	<span class="type">int</span> op,l,r; <span class="comment">// op是操作,l和r是合并或判断关系的两个并查集</span></span><br><span class="line">	<span class="comment">// 1. 初始化每个结点的父节点都是自己</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) </span><br><span class="line">		fa[i]=i;</span><br><span class="line">	<span class="keyword">while</span>(m--) &#123;</span><br><span class="line">		cin&gt;&gt;op&gt;&gt;l&gt;&gt;r;</span><br><span class="line">		<span class="keyword">if</span>(op==<span class="number">1</span>)</span><br><span class="line">			<span class="built_in">join</span>(l,r);</span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span>(op==<span class="number">2</span>) &#123;</span><br><span class="line">			<span class="keyword">if</span>(<span class="built_in">find</span>(l)==<span class="built_in">find</span>(r)) <span class="comment">// 在同一并查集中</span></span><br><span class="line">				cout&lt;&lt;<span class="string">&quot;Y\n&quot;</span>;</span><br><span class="line">			<span class="keyword">else</span></span><br><span class="line">				cout&lt;&lt;<span class="string">&quot;N\n&quot;</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="4-维护信息的并查集">4. 维护信息的并查集</span></h2><h3><span id="41-维护各集合中元素总数">4.1. 维护各集合中元素总数</span></h3><ul>
+<li>只需要在合并时进行计算即可，将子集合中的元素个数加等到父集合的元素个数中</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> cnt[N]; <span class="comment">// cnt[i]:以i为根节点的集合的元素个数 </span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 维护集合总数的合并</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">merge</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b)</span> &#123;</span><br><span class="line">	<span class="type">int</span> x=find(a);</span><br><span class="line">	<span class="type">int</span> y=find(b);</span><br><span class="line">	<span class="keyword">if</span>(x==y) <span class="keyword">return</span>;</span><br><span class="line">	fa[x]=y; <span class="comment">// a所在集合根节点作为b所在集合根节点的儿子节点</span></span><br><span class="line">	<span class="comment">// 如果遇到重复的语句,那么此时x==y成立,所以不再重复计数</span></span><br><span class="line">	cnt[y]+=cnt[x];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3><span id="42-维护总集合个数">4.2. 维护总集合个数</span></h3><ul>
+<li>有多少个集合即是看有多少个节点的 $x&#x3D;&#x3D;fa[x]$ 即有多少个根节点，无需维护，$O(n)$ 遍历一遍即可</li>
+</ul>
+<h2><span id="5-完备并查集">5. 完备并查集</span></h2><ul>
+<li>非常好用</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span>+<span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 完备并查集</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">DSU</span> &#123;</span></span><br><span class="line">	<span class="comment">// fa:每个结点的父结点</span></span><br><span class="line">	<span class="comment">// p:每个集合的结点数量</span></span><br><span class="line">	<span class="comment">// e:每个集合边的数量</span></span><br><span class="line">	<span class="comment">// f:记录集合中是否存在自环</span></span><br><span class="line">	<span class="built_in">vector</span>&lt;<span class="type">int</span>&gt; fa,p,e,f; </span><br><span class="line"></span><br><span class="line">	<span class="comment">// 初始化一个并查集</span></span><br><span class="line">	DSU(<span class="type">int</span> n) &#123;</span><br><span class="line">		<span class="comment">// 大小为n+1,下标从0~n,我们可以从1开始使用</span></span><br><span class="line">		</span><br><span class="line">		fa.resize(n+<span class="number">1</span>); <span class="comment">// 大小调整为n+1 </span></span><br><span class="line">		<span class="comment">// fa从起始位置到结束位置,从0开始递增赋值,即父结点为自己</span></span><br><span class="line">		<span class="comment">// 即fa[0]=0,fa[1]=1,...,fa[n]=n</span></span><br><span class="line">		iota(fa.begin(),fa.end(),<span class="number">0</span>); </span><br><span class="line">		p.resize(n+<span class="number">1</span>,<span class="number">1</span>); <span class="comment">// 每个结点单独成为一个集合,大小为1</span></span><br><span class="line">		e.resize(n+<span class="number">1</span>); <span class="comment">// 初始时每个集合没有边</span></span><br><span class="line">		f.resize(n+<span class="number">1</span>); <span class="comment">// 初始时没有自环</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 找x所在集合的根节点</span></span><br><span class="line">	<span class="type">int</span> <span class="title function_">get</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">		<span class="comment">// 找x的根节点,并作路径压缩</span></span><br><span class="line">		<span class="keyword">while</span>(x!=fa[x]) &#123;</span><br><span class="line">			x=fa[x]=fa[fa[x]];</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> x;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 假设x所在集合为A,假设y所在集合为B,合并A和B</span></span><br><span class="line">	<span class="type">bool</span> <span class="title function_">merge</span><span class="params">(<span class="type">int</span> x,<span class="type">int</span> y)</span> &#123;</span><br><span class="line">		<span class="comment">// 设x是y的祖先</span></span><br><span class="line">		<span class="keyword">if</span>(x==y) f[get(x)]=<span class="number">1</span>; <span class="comment">// 如果自己和自己合并,则存在自环</span></span><br><span class="line">		x=get(x),y=get(y);</span><br><span class="line">		e[x]++; <span class="comment">// 集合A边数+1</span></span><br><span class="line">		<span class="keyword">if</span>(x==y) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">		<span class="keyword">if</span>(x&lt;y) swap(x,y); <span class="comment">// 指定将编号小的合并到编号大的上</span></span><br><span class="line">		fa[y]=x; <span class="comment">// 集合B父结点变为x</span></span><br><span class="line">		<span class="comment">// 若B有自环,则合并后A有自环,或运算是一起看,有1则1</span></span><br><span class="line">		<span class="comment">// A加上B中边的数量和结点数量</span></span><br><span class="line">		f[x]|=f[y],p[x]+=p[y],e[x]+=e[y];</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 判断x和y是否在同一集合中</span></span><br><span class="line">	<span class="type">bool</span> <span class="title function_">same</span><span class="params">(<span class="type">int</span> x,<span class="type">int</span> y)</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> get(x)==get(y);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 判断x所在集合是否存在自环</span></span><br><span class="line">	<span class="type">bool</span> <span class="title function_">F</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> f[get(x)];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 输出集合中点的数量</span></span><br><span class="line">	<span class="type">int</span> <span class="title function_">size</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> p[get(x)];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 输出集合中边的数量</span></span><br><span class="line">	<span class="type">int</span> <span class="title function_">E</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> e[get(x)];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="comment">// 用完备并查集解板子题</span></span><br><span class="line">	<span class="type">int</span> n,m;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n&gt;&gt;m;</span><br><span class="line">	DSU <span class="title function_">dsu</span><span class="params">(n)</span>; <span class="comment">// 创建并查集</span></span><br><span class="line">	<span class="keyword">while</span>(m--) &#123;</span><br><span class="line">		<span class="type">int</span> op,a,b;</span><br><span class="line">		<span class="built_in">cin</span>&gt;&gt;op;</span><br><span class="line">		<span class="keyword">if</span>(op==<span class="number">1</span>) &#123;</span><br><span class="line">			<span class="built_in">cin</span>&gt;&gt;a&gt;&gt;b;</span><br><span class="line">			dsu.merge(a,b); <span class="comment">// 合并a,b所在集合</span></span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="built_in">cin</span>&gt;&gt;a&gt;&gt;b;</span><br><span class="line">			<span class="keyword">if</span>(dsu.same(a,b)) &#123;</span><br><span class="line">				<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;Y&quot;</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;N&quot;</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;	</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2024/10/03/%E5%B9%B6%E6%9F%A5%E9%9B%86/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">数据结构</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E7%AB%9E%E8%B5%9B/" rel="tag">算法竞赛</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2024/10/03/%E5%8D%95%E8%B0%83%E9%98%9F%E5%88%97/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            单调队列
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2024/10/03/lower-bound%E3%80%81upper-bound%E5%87%BD%E6%95%B0/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">lower_bound、upper_bound函数</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.staticfile.org/valine/1.4.16/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "92B90kPxtBbndNGuCdYouFEO-gzGzoHsz",
+    app_key: "GnHcvbn2eo3Vvqi6x4X90ogH",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2024
+        <i class="ri-heart-fill heart_icon"></i> John Doe
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-sea-side.svg" alt="漂至"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2106426315&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<!-- hexo injector body_end start --><script data-pjax src="https://unpkg.com/oh-my-live2d"></script><script>const oml2d = OML2D.loadOml2d({dockedPosition:"left",mobileDisplay:true,models:[{"path":"https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json","scale":0.12,"position":[0,0],"stageStyle":{"width":250},"mobileScale":0.08,"mobilePosition":[0,0],"mobileStageStyle":{"width":180}}],parentElement:document.body,primaryColor:"var(--btn-bg)",sayHello:false,tips:{style: {"width":230,"height":120,"left":"calc(50% - 20px)","top":"-100px"},mobileStyle: {"width":180,"height":80,"left":"calc(50% - 30px)","top":"-100px"},idleTips:{interval:15000,message:function(){
+  return axios.get('https://v1.hitokoto.cn?c=i')
+    .then(function (response) {
+      return response.data.hitokoto ;
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+}}});</script><!-- hexo injector body_end end --></body>
+
+</html>

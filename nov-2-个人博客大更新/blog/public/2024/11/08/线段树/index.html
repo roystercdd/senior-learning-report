@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="生活,思考,代码,博客,摄影" />
+       
+      <meta name="description" content="欢迎光临CDD的个人网站~~~" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>线段树 |  漂至</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/deadpool.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="漂至" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-线段树"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  线段树
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2024/11/08/%E7%BA%BF%E6%AE%B5%E6%A0%91/" class="article-date">
+  <time datetime="2024-11-08T12:28:29.000Z" itemprop="datePublished">2024-11-08</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">3k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">13 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <meta name="referrer" content="no-referrer">
+
+<h1><span id="线段树">线段树</span></h1><!-- toc -->
+
+<ul>
+<li><a href="#0-%E6%A6%82%E8%BF%B0">0. 概述</a></li>
+<li><a href="#1-%E9%80%92%E5%BD%92%E5%BB%BA%E6%A0%91">1. 递归建树</a></li>
+<li><a href="#2-%E7%82%B9%E4%BF%AE%E6%94%B9">2. 点修改</a></li>
+<li><a href="#3-%E5%8C%BA%E9%97%B4%E6%9F%A5%E8%AF%A2">3. 区间查询</a></li>
+<li><a href="#4-%E5%8C%BA%E9%97%B4%E4%BF%AE%E6%94%B9">4. 区间修改</a><ul>
+<li><a href="#41-%E7%BA%BF%E6%AE%B5%E6%A0%91%E7%9A%84%E7%BB%93%E6%9E%84">4.1. 线段树的结构</a></li>
+<li><a href="#42-%E5%90%91%E4%B8%8A%E6%9B%B4%E6%96%B0%E5%87%BD%E6%95%B0">4.2. 向上更新函数</a></li>
+<li><a href="#43-%E5%90%91%E4%B8%8B%E4%BC%A0%E9%80%92%E6%87%92%E6%A0%87%E8%AE%B0%E7%9A%84%E5%87%BD%E6%95%B0">4.3. 向下传递懒标记的函数</a></li>
+</ul>
+</li>
+<li><a href="#5-%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81">5. 完整代码</a></li>
+</ul>
+<!-- tocstop -->
+
+<span id="more"></span>
+
+
+
+<h2><span id="0-概述">0. 概述</span></h2><ul>
+<li>线段树是基于分治思想的二叉树，用来维护区间信息（区间和，区间最值，区间GCD等），可以在 $O(log^n)$ 的时间内执行区间修改和区间查询（树状数组是区间查询，单点修改和单点查询、区间修改，遇到复杂问题直接无脑线段树）</li>
+<li>现在看起来，线段树和归并排序非常的类似，这个数据结构比较简单</li>
+</ul>
+<img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20230728163803113.png" alt="image-20230728163803113" style="zoom: 80%;">
+
+
+
+<h2><span id="1-递归建树">1. 递归建树</span></h2><blockquote>
+<p>build函数：在一段区间上初始化线段树</p>
+</blockquote>
+<ul>
+<li>二叉树的性质：父节点编号为p，那么左孩子编号为2p，右孩子编号为2p+1</li>
+</ul>
+<img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20230728164819785.png" alt="image-20230728164819785" style="zoom:80%;">
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> maxn=<span class="number">5e5</span><span class="number">+5</span>;</span><br><span class="line"><span class="type">int</span> n,w[maxn]; <span class="comment">// w是要维护的一维数组</span></span><br><span class="line"><span class="comment">// l:区间的左端点</span></span><br><span class="line"><span class="comment">// r:区间的右端点</span></span><br><span class="line"><span class="comment">// sum:区间和</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Node</span> &#123;</span><br><span class="line">	<span class="type">int</span> l,r,sum;</span><br><span class="line">&#125;t[maxn*<span class="number">4</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// p:根节点的编号</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">build</span><span class="params">(<span class="type">int</span> p,<span class="type">int</span> l,<span class="type">int</span> r)</span> </span>&#123;</span><br><span class="line">	t[p]=&#123;l,r,w[l]&#125;; <span class="comment">// w[l]对叶子节点才有意义,最后回溯赋值</span></span><br><span class="line">	<span class="keyword">if</span>(l==r)</span><br><span class="line">		<span class="keyword">return</span>; <span class="comment">// 如果是叶子节点,返回</span></span><br><span class="line">	<span class="type">int</span> m=(l+r)&gt;&gt;<span class="number">1</span>; <span class="comment">// 不是叶子,则分裂,m是中点</span></span><br><span class="line">	<span class="built_in">build</span>(lc,l,m);</span><br><span class="line">	<span class="built_in">build</span>(rc,m<span class="number">+1</span>,r);</span><br><span class="line">	t[p].sum=t[lc].sum+t[rc].sum; <span class="comment">// 更新父节点的sum值</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>由图可知，当有10个节点时，深度至少都为4（$10&gt;2^3$ &amp;&amp; $10&lt;2^4$ ），此时编号最多能有31个（$2^5-1$）【下一层填满】，设第四层为n，那么前三层的和为n-1，倘若第五层填满（此时构成满二叉树），则根据二叉树的性质有2n个节点，此时节点一共有 $n-1+n+2n$ (最多的情况)，可以发现是最多是n的四倍，所以我们预备 $4×maxn$ 的空间。</li>
+</ul>
+<h2><span id="2-点修改">2. 点修改</span></h2><blockquote>
+<p>update函数：用子节点的信息更新当前节点信息</p>
+</blockquote>
+<ul>
+<li>算法思路：从根节点开始，递归找到叶子节点，把该节点的值增加 $k$ ，找到后从下往上通过回溯的方式为父节点不断更新值</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20230728171352718.png" alt="image-20230728171352718"></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 点修改</span></span><br><span class="line"><span class="comment">// p:根节点</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">update</span><span class="params">(<span class="type">int</span> p,<span class="type">int</span> x,<span class="type">int</span> k)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 如果是叶子节点</span></span><br><span class="line">	<span class="keyword">if</span>(t[p].l==x &amp;&amp; t[p].r==x) &#123;</span><br><span class="line">		t[p].sum+=k;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 非叶子节点裂开,中间点为m</span></span><br><span class="line">	<span class="type">int</span> m=(t[p].l+t[p].r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">if</span>(x&lt;=m)</span><br><span class="line">		<span class="built_in">update</span>(lc,x,k);</span><br><span class="line">	<span class="keyword">if</span>(x&gt;m)</span><br><span class="line">		<span class="built_in">update</span>(rc,x,k);</span><br><span class="line">	<span class="comment">// 更新父节点的sum值</span></span><br><span class="line">	t[p].sum=t[lc].sum+t[rc].sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="3-区间查询">3. 区间查询</span></h2><blockquote>
+<p>query函数：区间查询</p>
+</blockquote>
+<ul>
+<li><p>算法思路：拆分和拼凑，思想，例如：查询区间[4,9]可以拆分为[4,5],[6,8],[9,9]，通过合并三个结果的答案得到最终答案</p>
+</li>
+<li><p>从根节点进入，递归执行以下过程：</p>
+<ol>
+<li>若查询区间[x,y]完全覆盖当前节点区间，则立即回溯，并返回该节点的sum值</li>
+<li>若左子节点与[x,y]有重叠，则递归访问左子树</li>
+<li>若右子节点与[x,y]有重叠，则递归访问右子树</li>
+</ol>
+</li>
+<li><p>举个例子，如果找[4,9]的元素和，从根节点开始，[4,9]与[1,5]有重叠，所以访问左子树，与[1,3]无重叠，所以访问[4,5]，发现[4,5]包含在[4,9]中，所以作为答案的一部分加起来；访问完了，回溯回溯，[4,9]与[6,10]有重叠，所以访问右子树，[6,10]的左子树[6,8]是[4,9]的一部分，所以作为答案的一部分加起来，继续访问右子树[9,10]与[4,9]有重叠而不是包含关系，所以访问右子树，找到[9,9]包含在[4,9]中，所以作为答案的一部分加起来，右子树[10,10]与[4,9]无重叠，不访问，全部访问完了，回溯回溯回溯，递归结束。</p>
+</li>
+</ul>
+<img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20230728172242397.png" alt="image-20230728172242397" style="zoom:80%;">
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 区间查询</span></span><br><span class="line"><span class="comment">// p:根节点编号</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">query</span><span class="params">(<span class="type">int</span> p,<span class="type">int</span> x,<span class="type">int</span> y)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 如果完全覆盖了,说明你是答案的一部分,则加上</span></span><br><span class="line">	<span class="keyword">if</span>(x&lt;=t[p].l &amp;&amp; t[p].r&lt;=y) &#123;</span><br><span class="line">		<span class="keyword">return</span> t[p].sum;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="type">int</span> m=(t[p].l+t[p].r)&gt;&gt;<span class="number">1</span>; <span class="comment">// 如果不覆盖则分裂</span></span><br><span class="line">	<span class="type">int</span> sum=<span class="number">0</span>;</span><br><span class="line">	<span class="comment">// 与左边界有重叠,则去递归查询左子树</span></span><br><span class="line">	<span class="keyword">if</span>(x&lt;=m)</span><br><span class="line">		sum+=<span class="built_in">query</span>(lc,x,y);</span><br><span class="line">	<span class="comment">// 与右边界有重叠,则去递归查询右子树</span></span><br><span class="line">	<span class="keyword">if</span>(y&gt;m)</span><br><span class="line">		sum+=<span class="built_in">query</span>(rc,x,y);</span><br><span class="line">	<span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="4-区间修改">4. 区间修改</span></h2><blockquote>
+<p>modify函数：区间修改</p>
+</blockquote>
+<ul>
+<li>算法思路：例如，对区间[4,9]的每个数加上5，如果修改区间[x,y]所覆盖的每个叶子节点，时间将会是O(n)，如果我们做<strong>懒惰修改</strong>（通过一个变量来记账，并没有真正的修改这个节点中的值），先修改该区间的sum值，再打上一个“懒标记”，然后立即返回。等下次需要时，再下传“懒标记”（这个时候才是真正的赋值），这样，就可以把每次修改和查询的时间都控制到O(log<sup>n</sup>)。</li>
+<li>举个例子：同样还是[4,9]+5的例子，从根节点开始，分裂成[1,5]和[6,10]，未完全覆盖，继续往下，找到[4,5]，完全覆盖了，因为[4,5]的宽度为2，所以节点5的sum+&#x3D;10(2×5)，打上懒标记add&#x3D;5，此时对于节点5(sum&#x3D;20, add&#x3D;5)，找到过后回溯到2，对于1来说递归完了左子树，继续递归右子树，对于节点3，未完全覆盖，往下找到[6,8]，此时已完全覆盖，节点3的宽度为3，所以节点3的sum+&#x3D;15(5×3)，打上懒标记add&#x3D;5，此时对于节点3(sum&#x3D;25, add&#x3D;6)，回溯，递归3的右子树，向下找到完全覆盖的[9,9]，此时宽度为1，所以节点7的sum加上5，打上懒标记add&#x3D;5，回溯，通过sum更新父节点的值，直至根节点，结束！</li>
+</ul>
+<img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20230728193520637.png" alt="image-20230728193520637" style="zoom:80%;">
+
+
+
+<h3><span id="41-线段树的结构">4.1. 线段树的结构</span></h3><ul>
+<li>由于引入了懒标记add，所以结构体变为：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Node</span> &#123;</span><br><span class="line">	<span class="type">int</span> l; <span class="comment">// 左子树编号 </span></span><br><span class="line">	<span class="type">int</span> r; <span class="comment">// 右子树编号</span></span><br><span class="line">	<span class="type">int</span> sum; <span class="comment">// 该节点所拥有的叶子节点的值之和</span></span><br><span class="line">	<span class="type">int</span> add; <span class="comment">// 懒标记(用于区间修改中)</span></span><br><span class="line">&#125;t[maxn*<span class="number">4</span>];</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="42-向上更新函数">4.2. 向上更新函数</span></h3><ul>
+<li>将t[p].sum&#x3D;t[lc].sum+t[rc].sum 总结成一个函数，增强可读性，用于更新结点的sum</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 向上更新节点的sum值</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">pushup</span><span class="params">(<span class="type">int</span> p)</span> </span>&#123;</span><br><span class="line">	t[p].sum=t[lc].sum+t[rc].sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="43-向下传递懒标记的函数">4.3. 向下传递懒标记的函数</span></h3><ul>
+<li>向下传递懒标记是为了真正要用到这个点的时候(当然没用到这个点的时候，要求和直接用父节点的sum就行了)，能以时间复杂度O(n)的方式来为其赋值。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 向下更新节点的sum值(通过父节点打上的懒标记)</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">pushdown</span><span class="params">(<span class="type">int</span> p)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 如果有懒标记</span></span><br><span class="line">	<span class="keyword">if</span>(t[p].add) &#123;</span><br><span class="line">		<span class="comment">// 左子树的sum值增加宽度*懒标记的值,比如左子树是[3,4](设懒标记为5),那么这个节点的值sum增加10,add为5</span></span><br><span class="line">		<span class="comment">// 如果后续还需要下传懒标记,再传递给[3,3]和[4,4],sum分别增加宽度为1*add(5)=5,很好理解吧?</span></span><br><span class="line">		t[lc].sum+=t[p].add*(t[lc].r-t[lc].l<span class="number">+1</span>); <span class="comment">// right-left+1 是求宽度 </span></span><br><span class="line">		t[rc].sum+=t[p].add*(t[rc].r-t[lc].l<span class="number">+1</span>);</span><br><span class="line">		t[lc].add+=t[p].add; <span class="comment">// 懒标记增加父节点的懒标记(下传了,这个值要存起来)</span></span><br><span class="line">		t[rc].add+=t[p].add;</span><br><span class="line">		t[p].add=<span class="number">0</span>; <span class="comment">// 传完了,懒标记置为0</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="5-完整代码">5. 完整代码</span></h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> lc p&lt;&lt;1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> rc p&lt;&lt;1|1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> int long long</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> maxn=<span class="number">1e5</span><span class="number">+5</span>;</span><br><span class="line"><span class="type">int</span> n,w[maxn]; <span class="comment">// w是要维护的一维数组</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Node</span> &#123;</span><br><span class="line">	<span class="type">int</span> l; <span class="comment">// 左子树编号 </span></span><br><span class="line">	<span class="type">int</span> r; <span class="comment">// 右子树编号</span></span><br><span class="line">	<span class="type">int</span> sum; <span class="comment">// 该节点所拥有的叶子节点的值之和</span></span><br><span class="line">	<span class="type">int</span> add; <span class="comment">// 懒标记(用于区间修改中)</span></span><br><span class="line">&#125;t[maxn*<span class="number">4</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 向上更新节点的sum值</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">pushup</span><span class="params">(<span class="type">int</span> p)</span> </span>&#123;</span><br><span class="line">	t[p].sum=t[lc].sum+t[rc].sum;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 向下更新节点的sum值(通过父节点打上的懒标记)</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">pushdown</span><span class="params">(<span class="type">int</span> p)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 如果有懒标记</span></span><br><span class="line">	<span class="keyword">if</span>(t[p].add) &#123;</span><br><span class="line">		<span class="comment">// 左子树的sum值增加宽度*懒标记的值,比如左子树是[3,4](设懒标记为5),那么这个节点的值sum增加10,add为5</span></span><br><span class="line">		<span class="comment">// 如果后续还需要下传懒标记,再传递给[3,3]和[4,4],sum分别增加宽度为1*add(5)=5,很好理解吧?</span></span><br><span class="line">		t[lc].sum+=t[p].add*(t[lc].r-t[lc].l<span class="number">+1</span>); <span class="comment">// right-left+1 是求宽度 </span></span><br><span class="line">		t[rc].sum+=t[p].add*(t[rc].r-t[rc].l<span class="number">+1</span>);</span><br><span class="line">		t[lc].add+=t[p].add; <span class="comment">// 懒标记增加父节点的懒标记(下传了,这个值要存起来)</span></span><br><span class="line">		t[rc].add+=t[p].add;</span><br><span class="line">		t[p].add=<span class="number">0</span>; <span class="comment">// 传完了,懒标记置为0</span></span><br><span class="line">	&#125;</span><br><span class="line"><span class="comment">//	auto &amp;u=t[p],&amp;l=t[lc],&amp;r=t[rc];</span></span><br><span class="line"><span class="comment">//	if(u.add) &#123;</span></span><br><span class="line"><span class="comment">//		l.sum+=u.add*(l.r-l.l+1),</span></span><br><span class="line"><span class="comment">//		r.sum+=u.add*(r.r-r.l+1),</span></span><br><span class="line"><span class="comment">//		l.add+=u.add,</span></span><br><span class="line"><span class="comment">//		r.add+=u.add,</span></span><br><span class="line"><span class="comment">//		u.add=0;</span></span><br><span class="line"><span class="comment">//	&#125;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 构造线段树</span></span><br><span class="line"><span class="comment">// p:根节点的编号</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">build</span><span class="params">(<span class="type">int</span> p,<span class="type">int</span> l,<span class="type">int</span> r)</span> </span>&#123;</span><br><span class="line">	t[p]=&#123;l,r,w[l],<span class="number">0</span>&#125;; <span class="comment">// w[l]对叶子节点才有意义,最后回溯赋值</span></span><br><span class="line">	<span class="keyword">if</span>(l==r)</span><br><span class="line">		<span class="keyword">return</span>; <span class="comment">// 如果是叶子节点,返回</span></span><br><span class="line">	<span class="type">int</span> m=(l+r)&gt;&gt;<span class="number">1</span>; <span class="comment">// 不是叶子,则分裂,m是中点</span></span><br><span class="line">	<span class="built_in">build</span>(lc,l,m);</span><br><span class="line">	<span class="built_in">build</span>(rc,m<span class="number">+1</span>,r);</span><br><span class="line">	<span class="comment">// 更新父节点的sum值</span></span><br><span class="line">	<span class="built_in">pushup</span>(p);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 点修改</span></span><br><span class="line"><span class="comment">// p:根节点</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">update</span><span class="params">(<span class="type">int</span> p,<span class="type">int</span> x,<span class="type">int</span> k)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 如果是叶子节点</span></span><br><span class="line">	<span class="keyword">if</span>(t[p].l==x &amp;&amp; t[p].r==x) &#123;</span><br><span class="line">		t[p].sum+=k;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 非叶子节点裂开,中间点为m</span></span><br><span class="line">	<span class="type">int</span> m=(t[p].l+t[p].r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">	<span class="keyword">if</span>(x&lt;=m)</span><br><span class="line">		<span class="built_in">update</span>(lc,x,k);</span><br><span class="line">	<span class="keyword">if</span>(x&gt;m)</span><br><span class="line">		<span class="built_in">update</span>(rc,x,k);</span><br><span class="line">	<span class="comment">// 更新父节点的sum值</span></span><br><span class="line">	t[p].sum=t[lc].sum+t[rc].sum;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 区间查询</span></span><br><span class="line"><span class="comment">// p:根节点编号</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">query</span><span class="params">(<span class="type">int</span> p,<span class="type">int</span> x,<span class="type">int</span> y)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 如果完全覆盖了,说明你是答案的一部分,则加上</span></span><br><span class="line">	<span class="keyword">if</span>(x&lt;=t[p].l &amp;&amp; t[p].r&lt;=y) &#123;</span><br><span class="line">		<span class="keyword">return</span> t[p].sum;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="type">int</span> m=(t[p].l+t[p].r)&gt;&gt;<span class="number">1</span>; <span class="comment">// 如果不覆盖则分裂</span></span><br><span class="line">	<span class="built_in">pushdown</span>(p); <span class="comment">// 下传懒标记</span></span><br><span class="line">	<span class="type">int</span> sum=<span class="number">0</span>;</span><br><span class="line">	<span class="comment">// 与左边界有重叠,则去递归查询左子树</span></span><br><span class="line">	<span class="keyword">if</span>(x&lt;=m)</span><br><span class="line">		sum+=<span class="built_in">query</span>(lc,x,y);</span><br><span class="line">	<span class="comment">// 与右边界有重叠,则去递归查询右子树</span></span><br><span class="line">	<span class="keyword">if</span>(y&gt;m)</span><br><span class="line">		sum+=<span class="built_in">query</span>(rc,x,y);</span><br><span class="line">	<span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 区间更新</span></span><br><span class="line"><span class="comment">// p:根节点,x~y:区间,k:增加的值</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">update</span><span class="params">(<span class="type">int</span> p,<span class="type">int</span> x,<span class="type">int</span> y,<span class="type">int</span> k)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 完全覆盖才更新值</span></span><br><span class="line">	<span class="keyword">if</span>(x&lt;=t[p].l &amp;&amp; t[p].r&lt;=y) &#123;</span><br><span class="line">		t[p].sum+=(t[p].r-t[p].l<span class="number">+1</span>)*k; <span class="comment">// 增加区间宽度*k</span></span><br><span class="line">		t[p].add+=k; <span class="comment">// 打上懒标记</span></span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 如果没覆盖,则分裂,m是中间点</span></span><br><span class="line">	<span class="type">int</span> m=(t[p].l+t[p].r)&gt;&gt;<span class="number">1</span>;</span><br><span class="line">	<span class="built_in">pushdown</span>(p); <span class="comment">// 下传懒标记</span></span><br><span class="line">	<span class="comment">// 如果有重叠,去更新左子树</span></span><br><span class="line">	<span class="keyword">if</span>(x&lt;=m)</span><br><span class="line">		<span class="built_in">update</span>(lc,x,y,k);</span><br><span class="line">	<span class="comment">// 如果有重叠,去更新右子树</span></span><br><span class="line">	<span class="keyword">if</span>(y&gt;m)</span><br><span class="line">		<span class="built_in">update</span>(rc,x,y,k);</span><br><span class="line">	<span class="built_in">pushup</span>(p);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">signed</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="type">int</span> n,m; <span class="comment">// n是数列个数,m是操作次数</span></span><br><span class="line">	cin&gt;&gt;n&gt;&gt;m;</span><br><span class="line">	<span class="comment">// 输入要维护的一维数组</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		cin&gt;&gt;w[i];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 根据一维数组来构造线段树,意为:根节点为1,从1~n</span></span><br><span class="line">	<span class="built_in">build</span>(<span class="number">1</span>,<span class="number">1</span>,n); <span class="comment">// 构造线段树</span></span><br><span class="line">	<span class="type">int</span> op; <span class="comment">// 操作类型</span></span><br><span class="line">	<span class="type">int</span> l,r; <span class="comment">// 左右区间</span></span><br><span class="line">	<span class="type">int</span> k; <span class="comment">// 增加的值</span></span><br><span class="line">	<span class="keyword">while</span>(m--) &#123;</span><br><span class="line">		cin&gt;&gt;op;</span><br><span class="line">		<span class="keyword">if</span>(op==<span class="number">1</span>) &#123;</span><br><span class="line">			cin&gt;&gt;l&gt;&gt;r&gt;&gt;k;</span><br><span class="line">			<span class="comment">// 区间更新</span></span><br><span class="line">			<span class="built_in">update</span>(<span class="number">1</span>,l,r,k); <span class="comment">// 更新</span></span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span>(op==<span class="number">2</span>) &#123;</span><br><span class="line">			cin&gt;&gt;l&gt;&gt;r;</span><br><span class="line">			<span class="comment">// 区间求和</span></span><br><span class="line">			cout&lt;&lt;<span class="built_in">query</span>(<span class="number">1</span>,l,r)&lt;&lt;endl;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">5个数字,5个操作</span></span><br><span class="line"><span class="comment">1 x y k 将[x,y]加上k</span></span><br><span class="line"><span class="comment">2 x y 输出[x,y]每个数的和</span></span><br><span class="line"><span class="comment">输入样例:</span></span><br><span class="line"><span class="comment">5 5</span></span><br><span class="line"><span class="comment">1 5 4 2 3</span></span><br><span class="line"><span class="comment">2 2 4</span></span><br><span class="line"><span class="comment">1 2 3 2</span></span><br><span class="line"><span class="comment">2 3 4</span></span><br><span class="line"><span class="comment">1 1 5 1</span></span><br><span class="line"><span class="comment">2 1 4</span></span><br><span class="line"><span class="comment">输出样例:</span></span><br><span class="line"><span class="comment">11</span></span><br><span class="line"><span class="comment">8</span></span><br><span class="line"><span class="comment">20</span></span><br></pre></td></tr></table></figure>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2024/11/08/%E7%BA%BF%E6%AE%B5%E6%A0%91/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%A0%91/" rel="tag">树</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E7%AB%9E%E8%B5%9B/" rel="tag">算法竞赛</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BA%BF%E6%AE%B5%E6%A0%91/" rel="tag">线段树</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E9%AB%98%E7%BA%A7%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">高级数据结构</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2024/11/08/%E6%99%AE%E9%80%9A%E5%B9%B3%E8%A1%A1%E6%A0%91/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            普通平衡树
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2024/11/08/%E6%A0%91%E7%8A%B6%E6%95%B0%E7%BB%84/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">树状数组</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.staticfile.org/valine/1.4.16/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "92B90kPxtBbndNGuCdYouFEO-gzGzoHsz",
+    app_key: "GnHcvbn2eo3Vvqi6x4X90ogH",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2024
+        <i class="ri-heart-fill heart_icon"></i> John Doe
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-sea-side.svg" alt="漂至"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2106426315&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<!-- hexo injector body_end start --><script data-pjax src="https://unpkg.com/oh-my-live2d"></script><script>const oml2d = OML2D.loadOml2d({dockedPosition:"left",mobileDisplay:true,models:[{"path":"https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json","scale":0.12,"position":[0,0],"stageStyle":{"width":250},"mobileScale":0.08,"mobilePosition":[0,0],"mobileStageStyle":{"width":180}}],parentElement:document.body,primaryColor:"var(--btn-bg)",sayHello:false,tips:{style: {"width":230,"height":120,"left":"calc(50% - 20px)","top":"-100px"},mobileStyle: {"width":180,"height":80,"left":"calc(50% - 30px)","top":"-100px"},idleTips:{interval:15000,message:function(){
+  return axios.get('https://v1.hitokoto.cn?c=i')
+    .then(function (response) {
+      return response.data.hitokoto ;
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+}}});</script><!-- hexo injector body_end end --></body>
+
+</html>

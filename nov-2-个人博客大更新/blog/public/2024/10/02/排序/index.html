@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="生活,思考,代码,博客,摄影" />
+       
+      <meta name="description" content="欢迎光临CDD的个人网站~~~" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>排序 |  漂至</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/deadpool.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="漂至" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-排序"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  排序
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2024/10/02/%E6%8E%92%E5%BA%8F/" class="article-date">
+  <time datetime="2024-10-02T14:30:58.000Z" itemprop="datePublished">2024-10-02</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">1.5k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">6 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <meta name="referrer" content="no-referrer">
+
+<h1><span id="排序">排序</span></h1><!-- toc -->
+
+<ul>
+<li><a href="#1-%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F">1. 快速排序</a></li>
+<li><a href="#2-%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F">2. 归并排序</a></li>
+<li><a href="#3-%E6%A1%B6%E6%8E%92%E5%BA%8F">3. 桶排序</a></li>
+<li><a href="#4-%E5%A0%86%E6%8E%92%E5%BA%8F">4. 堆排序</a></li>
+</ul>
+<!-- tocstop -->
+
+<span id="more"></span>
+
+
+
+<h2><span id="1-快速排序">1. 快速排序</span></h2><blockquote>
+<p>时间复杂度：$O(nlog^n)$，最坏 $O(n^2)$ ，不稳定</p>
+</blockquote>
+<ul>
+<li>基于分治法实现：</li>
+</ul>
+<ol>
+<li>确定分界点</li>
+<li>调整区间</li>
+<li>递归处理左右两段</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 快速排序模板</span></span><br><span class="line"><span class="comment">// l:左端点</span></span><br><span class="line"><span class="comment">// r:右端点</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">quick_sort</span><span class="params">(<span class="type">int</span> arr[],<span class="type">int</span> l,<span class="type">int</span> r)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(l&gt;=r)</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	<span class="comment">// 无符号右移一位等于除2</span></span><br><span class="line">	<span class="type">int</span> x=arr[l+r&gt;&gt;<span class="number">1</span>]; <span class="comment">// 找中间值</span></span><br><span class="line">	<span class="comment">// 遍历因子</span></span><br><span class="line">	<span class="type">int</span> i=l<span class="number">-1</span>;</span><br><span class="line">	<span class="type">int</span> j=r<span class="number">+1</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">while</span>(i&lt;j) &#123;</span><br><span class="line">        <span class="comment">// 把下面两个while中的&quot;&lt;&quot;和&quot;&gt;&quot;换一下就是从大到小排序</span></span><br><span class="line">		<span class="keyword">while</span>(arr[++i]&lt;x);</span><br><span class="line">		<span class="keyword">while</span>(arr[--j]&gt;x);</span><br><span class="line">		<span class="keyword">if</span>(i&lt;j)</span><br><span class="line">			<span class="built_in">swap</span>(arr[i],arr[j]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 分治法</span></span><br><span class="line">	<span class="built_in">quick_sort</span>(arr,l,j); <span class="comment">// 排序左侧</span></span><br><span class="line">	<span class="built_in">quick_sort</span>(arr,j<span class="number">+1</span>,r); <span class="comment">// 排序右侧</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="2-归并排序">2. 归并排序</span></h2><blockquote>
+<p>时间复杂度妥妥的：$O(nlog^2)$，稳定</p>
+</blockquote>
+<ul>
+<li>基于分治法实现：</li>
+</ul>
+<ol>
+<li>确定分界点</li>
+<li>递归把数据分成两段</li>
+<li>合二为一</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 归并排序模板</span></span><br><span class="line"><span class="comment">// arr[]:待排序数组</span></span><br><span class="line"><span class="comment">// l:排序左区间</span></span><br><span class="line"><span class="comment">// r:排序右区间</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">merge_sort</span><span class="params">(<span class="type">int</span> arr[],<span class="type">int</span> l,<span class="type">int</span> r)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(l&gt;=r)</span><br><span class="line">		<span class="keyword">return</span>; <span class="comment">// 传入数据有误</span></span><br><span class="line">	<span class="type">int</span> mid=l+r&gt;&gt;<span class="number">1</span>;</span><br><span class="line">	<span class="comment">// 递归将数据分成两段,回来时排序</span></span><br><span class="line">	<span class="built_in">merge_sort</span>(arr,l,mid);</span><br><span class="line">	<span class="built_in">merge_sort</span>(arr,mid<span class="number">+1</span>,r);</span><br><span class="line">	<span class="comment">// 回来时的操作</span></span><br><span class="line">	<span class="comment">// k:temp数组的遍历因子/</span></span><br><span class="line">	<span class="comment">// i:第一段的最左端</span></span><br><span class="line">	<span class="comment">// j:第二段的最左端</span></span><br><span class="line">	<span class="type">int</span> k=<span class="number">0</span>,i=l,j=mid<span class="number">+1</span>;</span><br><span class="line">	<span class="comment">// 从小到大排序</span></span><br><span class="line">	<span class="keyword">while</span>(i&lt;=mid &amp;&amp; j&lt;=r) &#123;</span><br><span class="line">		<span class="keyword">if</span>(arr[i]&lt;=arr[j])</span><br><span class="line">			temp[k++]=arr[i++]; </span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">			temp[k++]=arr[j++];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 把未排好的直接添加到temp末尾,下面两种情况二选一</span></span><br><span class="line">	<span class="keyword">while</span>(i&lt;=mid)</span><br><span class="line">		temp[k++]=arr[i++];</span><br><span class="line">	<span class="keyword">while</span>(j&lt;=r)</span><br><span class="line">		temp[k++]=arr[j++];</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 此时l和r是形参传递过来的l和r</span></span><br><span class="line">	<span class="comment">// j:temp的遍历因子,目的是赋值</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=l,j=<span class="number">0</span>;i&lt;=r;i++,j++) &#123;</span><br><span class="line">		arr[i]=temp[j];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>例题：<a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1908">P1908 逆序对 - 洛谷</a></p>
+</blockquote>
+<ul>
+<li>该题为利用归并排序求解逆序对的问题，携带了如何输出逆序对，但是没有解决以字典顺序输出逆序对的问题，可能要用其他算法。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> maxn=<span class="number">5e5</span><span class="number">+5</span>;</span><br><span class="line"><span class="type">int</span> arr[maxn];</span><br><span class="line"><span class="type">int</span> temp[maxn]; <span class="comment">// 辅助数组</span></span><br><span class="line"><span class="type">long</span> <span class="type">long</span> res; <span class="comment">// n=5e5,最大对数可能超过1e10*2</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">merge_sort</span><span class="params">(<span class="type">int</span> arr[],<span class="type">int</span> l,<span class="type">int</span> r)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(l&gt;=r)</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	<span class="type">int</span> mid=l+r&gt;&gt;<span class="number">1</span>;</span><br><span class="line">	<span class="comment">// 先分</span></span><br><span class="line">	<span class="built_in">merge_sort</span>(arr,l,mid);</span><br><span class="line">	<span class="built_in">merge_sort</span>(arr,mid<span class="number">+1</span>,r);</span><br><span class="line">	<span class="comment">// 合并</span></span><br><span class="line">	<span class="type">int</span> k=<span class="number">0</span>,i=l,j=mid<span class="number">+1</span>;</span><br><span class="line">	<span class="keyword">while</span>(i&lt;=mid &amp;&amp; j&lt;=r)&#123;</span><br><span class="line">		<span class="keyword">if</span>(arr[i]&lt;=arr[j])</span><br><span class="line">			temp[k++]=arr[i++];</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// 输出逆序对</span></span><br><span class="line"><span class="comment">//			for(int m=i;m&lt;=mid;m++) &#123;</span></span><br><span class="line"><span class="comment">//				cout&lt;&lt;&quot;&lt;&quot;&lt;&lt;arr[m]&lt;&lt;&quot;,&quot;&lt;&lt;arr[j]&lt;&lt;&quot;&gt;&quot;&lt;&lt;&#x27;\n&#x27;;</span></span><br><span class="line"><span class="comment">//			&#125;</span></span><br><span class="line">			temp[k++]=arr[j++];</span><br><span class="line">			<span class="comment">// 如果arr[i]比arr[j]大了,那么arr[i]右边的也比它大</span></span><br><span class="line">			res+=(mid-i<span class="number">+1</span>); <span class="comment">// 一共mid-i+1个</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">while</span>(i&lt;=mid)</span><br><span class="line">		temp[k++]=arr[i++];</span><br><span class="line">	<span class="keyword">while</span>(j&lt;=r)</span><br><span class="line">		temp[k++]=arr[j++];</span><br><span class="line">	<span class="comment">// 赋值</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=l,j=<span class="number">0</span>;i&lt;=r;i++,j++) &#123;</span><br><span class="line">		arr[i]=temp[j];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="type">int</span> n;</span><br><span class="line">	cin&gt;&gt;n;</span><br><span class="line">	<span class="comment">// test</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		cin&gt;&gt;arr[i];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">merge_sort</span>(arr,<span class="number">1</span>,n);</span><br><span class="line"><span class="comment">//	for(int i=1;i&lt;=n;i++) &#123;</span></span><br><span class="line"><span class="comment">//		cout&lt;&lt;arr[i]&lt;&lt;&#x27; &#x27;;</span></span><br><span class="line"><span class="comment">//	&#125;</span></span><br><span class="line"><span class="comment">//	cout&lt;&lt;&#x27;\n&#x27;;</span></span><br><span class="line">	cout&lt;&lt;res;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="3-桶排序">3. 桶排序</span></h2><blockquote>
+<p>时间复杂度：$O(n+k)$，$n$ 是输入数据量，$k$ 是桶的个数；空间复杂度：$O(k)$，额外分配的内存就是 $k$ 个桶的空间</p>
+</blockquote>
+<ol>
+<li>装桶</li>
+<li>倒桶</li>
+</ol>
+<ul>
+<li>注意：桶排序容易超出最大值（字典思想），通常每个值都特别限定的范围时用桶排序，如每个值都限定在 $[0,50]$ 之间。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> MAX_NUM=<span class="number">1e8</span>; <span class="comment">// 最大值不能超过1e8</span></span><br><span class="line"><span class="type">int</span> sum[MAX_NUM]; <span class="comment">// 值域</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">bucket_sort</span><span class="params">(<span class="type">int</span> arr[])</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 字典装桶</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++)</span><br><span class="line">		sum[arr[i]]++; <span class="comment">// 把数组的值装进桶</span></span><br><span class="line">	<span class="comment">// 倒出</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>,j=<span class="number">1</span>;j&lt;=n;i++) &#123;</span><br><span class="line">		<span class="comment">// 当sum[i]&gt;=1时才进入while</span></span><br><span class="line">		<span class="keyword">while</span>(sum[i]--)</span><br><span class="line">			arr[j++]=i; <span class="comment">// 下标即是值,对arr重新赋值排序后的结果</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>桶排序完整案例：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> pair&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> maxn=<span class="number">1e4</span><span class="number">+4</span>; <span class="comment">// 数字最大1e4个</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> maxv=<span class="number">1e4</span><span class="number">+4</span>; <span class="comment">// 每个数字的值最大1e4</span></span><br><span class="line"><span class="type">int</span> arr[maxv]; <span class="comment">// 桶</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="type">int</span> n;</span><br><span class="line">	cin&gt;&gt;n;</span><br><span class="line">	<span class="type">int</span> temp;</span><br><span class="line">	<span class="comment">// 字典装桶</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		cin&gt;&gt;temp;</span><br><span class="line">		arr[temp]++;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 从大到小倒桶</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=maxv;i&gt;=<span class="number">0</span>;i--) &#123;</span><br><span class="line">		<span class="comment">// 该字符打印arr[i]次,如果j=0则不进入</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;arr[i];j++) <span class="comment">// 注意这层循环的遍历次数由i来决定,所以这两层循环的时间复杂度都取决于i</span></span><br><span class="line">			cout&lt;&lt;i&lt;&lt;<span class="string">&#x27; &#x27;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="4-堆排序">4. 堆排序</span></h2><blockquote>
+<p>时间复杂度：$O(nlog^n)$</p>
+</blockquote>
+<ul>
+<li>堆（完全二叉树）：有大根堆和小根堆之分。</li>
+</ul>
+<ol>
+<li>求堆最小值：$q[1]$</li>
+<li>删除最小值：$q[1]&#x3D;q[size]$，$down(1)$</li>
+<li>输出堆顶，删除堆顶，长度减一，$down(1)$</li>
+</ol>
+<ul>
+<li>注：$down$ 是调整堆的操作，即与自己的孩子比较，将自己的值与其中最小且比自身更小的值交换。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 堆排序模板</span></span><br><span class="line"><span class="comment">// sz:当前堆大小</span></span><br><span class="line"><span class="comment">// t:当前堆</span></span><br><span class="line"><span class="type">int</span> sz; </span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">down</span><span class="params">(<span class="type">int</span> u)</span> </span>&#123;</span><br><span class="line">	<span class="type">int</span> t=u; </span><br><span class="line">	<span class="comment">// 如果左孩子在范围内且值更小</span></span><br><span class="line">	<span class="keyword">if</span>(<span class="number">2</span>*u&lt;=sz &amp;&amp; arr4[t]&gt;arr4[<span class="number">2</span>*u])</span><br><span class="line">		t=<span class="number">2</span>*u;</span><br><span class="line">	<span class="keyword">if</span>(<span class="number">2</span>*u<span class="number">+1</span>&lt;=sz &amp;&amp; arr4[t]&gt;arr4[<span class="number">2</span>*u<span class="number">+1</span>])</span><br><span class="line">		t=<span class="number">2</span>*u<span class="number">+1</span>;</span><br><span class="line">	<span class="keyword">if</span>(t!=u) &#123;</span><br><span class="line">		<span class="built_in">swap</span>(arr4[t],arr4[u]);</span><br><span class="line">		<span class="built_in">down</span>(t); <span class="comment">// 递归调整</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>主函数部分：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 测试堆排序</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">    cin&gt;&gt;arr4[i];</span><br><span class="line">&#125;</span><br><span class="line">sz=n; <span class="comment">// 初始堆大小</span></span><br><span class="line"><span class="comment">// 建立小根堆</span></span><br><span class="line"><span class="comment">// n/2是最后一个有孩子的节点</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=n/<span class="number">2</span>;i;i--)</span><br><span class="line">    <span class="built_in">down</span>(i);</span><br><span class="line"><span class="keyword">while</span>(n--) &#123;</span><br><span class="line">    cout&lt;&lt;arr4[<span class="number">1</span>]&lt;&lt;<span class="string">&quot; &quot;</span>; <span class="comment">// 输出堆顶</span></span><br><span class="line">    arr4[<span class="number">1</span>]=arr4[sz--]; <span class="comment">// 调整堆顶</span></span><br><span class="line">    <span class="built_in">down</span>(<span class="number">1</span>); <span class="comment">// 调整堆</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2024/10/02/%E6%8E%92%E5%BA%8F/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%8E%92%E5%BA%8F/" rel="tag">排序</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E7%AB%9E%E8%B5%9B/" rel="tag">算法竞赛</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2024/10/02/%E8%BF%9B%E5%88%B6%E8%BD%AC%E6%8D%A2/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            进制转换
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2024/10/02/%E9%AB%98%E7%B2%BE%E5%BA%A6/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">高精度</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.staticfile.org/valine/1.4.16/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "92B90kPxtBbndNGuCdYouFEO-gzGzoHsz",
+    app_key: "GnHcvbn2eo3Vvqi6x4X90ogH",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2024
+        <i class="ri-heart-fill heart_icon"></i> John Doe
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-sea-side.svg" alt="漂至"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2106426315&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<!-- hexo injector body_end start --><script data-pjax src="https://unpkg.com/oh-my-live2d"></script><script>const oml2d = OML2D.loadOml2d({dockedPosition:"left",mobileDisplay:true,models:[{"path":"https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json","scale":0.12,"position":[0,0],"stageStyle":{"width":250},"mobileScale":0.08,"mobilePosition":[0,0],"mobileStageStyle":{"width":180}}],parentElement:document.body,primaryColor:"var(--btn-bg)",sayHello:false,tips:{style: {"width":230,"height":120,"left":"calc(50% - 20px)","top":"-100px"},mobileStyle: {"width":180,"height":80,"left":"calc(50% - 30px)","top":"-100px"},idleTips:{interval:15000,message:function(){
+  return axios.get('https://v1.hitokoto.cn?c=i')
+    .then(function (response) {
+      return response.data.hitokoto ;
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+}}});</script><!-- hexo injector body_end end --></body>
+
+</html>

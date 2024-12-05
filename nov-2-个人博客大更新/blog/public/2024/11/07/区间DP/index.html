@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="生活,思考,代码,博客,摄影" />
+       
+      <meta name="description" content="欢迎光临CDD的个人网站~~~" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>区间DP |  漂至</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/deadpool.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="漂至" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-区间DP"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  区间DP
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2024/11/07/%E5%8C%BA%E9%97%B4DP/" class="article-date">
+  <time datetime="2024-11-07T13:17:37.000Z" itemprop="datePublished">2024-11-07</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">3.7k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">16 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <meta name="referrer" content="no-referrer">
+
+<h1><span id="区间dp">区间DP</span></h1><!-- toc -->
+
+<ul>
+<li><a href="#1-%E7%9F%B3%E5%AD%90%E5%90%88%E5%B9%B6">1. 石子合并</a></li>
+<li><a href="#2-%E7%8E%AF%E5%BD%A2%E7%9F%B3%E5%AD%90%E5%90%88%E5%B9%B6">2. 环形石子合并</a></li>
+<li><a href="#3-%E8%83%BD%E9%87%8F%E9%A1%B9%E9%93%BE">3. 能量项链</a></li>
+<li><a href="#4-%E5%87%B8%E5%A4%9A%E8%BE%B9%E5%BD%A2%E7%9A%84%E6%9C%80%E4%BC%98%E4%B8%89%E8%A7%92%E5%BD%A2%E5%88%92%E5%88%86">4. 凸多边形的最优三角形划分</a></li>
+</ul>
+<!-- tocstop -->
+
+<span id="more"></span>
+
+
+
+<h2><span id="1-石子合并">1. 石子合并</span></h2><blockquote>
+<p>题目链接：<a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1775">P1775 石子合并（弱化版） - 洛谷 </a>，推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1gz4y1y7Rv/?spm_id_from=333.999.0.0">E28【模板】区间DP 石子合并_bilibili</a></p>
+</blockquote>
+<ul>
+<li>如果石子可以不相邻，那么很显然是一个哈夫曼树，直接贪心即可，但是石子必须相邻取，情况太多了我们无法预知哪种取法是最优的</li>
+<li>区间 $dp$ 的思想也很简单，第一层枚举区间长度，第二层枚举区间起点，区间起点和区间长度共同决定了区间终点，第三层枚举的是分割点，分割点的取值是 $[区间起点，区间终点]$，以空间换时间动态求得最小值，如果要求最大值只需要把 $min$ 改为 $max$ 即可，注意如果要求最小值则初始化 $f$ 数组为极大值，再对边界赋初始值</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: 如果可以不相邻,那么贪心就是哈夫曼树</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">3e2</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"><span class="type">int</span> a[N];</span><br><span class="line"><span class="type">int</span> s[N]; <span class="comment">// 前缀和数组</span></span><br><span class="line"><span class="type">int</span> f[N][N]; <span class="comment">// f[l,r]:把l到r合并成一堆的最小代价</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="built_in">memset</span>(f,<span class="number">0x3f</span>,<span class="keyword">sizeof</span> f);</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>,&amp;a[i]);	</span><br><span class="line">		s[i]=s[i<span class="number">-1</span>]+a[i]; <span class="comment">// 便于求解合并的区间和</span></span><br><span class="line">		f[i][i]=<span class="number">0</span>; <span class="comment">// 合并自身初值为0</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 区间DP</span></span><br><span class="line">	<span class="comment">// 1) 枚举区间长度</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> len=<span class="number">2</span>;len&lt;=n;len++) &#123;</span><br><span class="line">		<span class="comment">// 2) 枚举区间起点</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> l=<span class="number">1</span>;l+len<span class="number">-1</span>&lt;=n;l++) &#123;</span><br><span class="line">			<span class="type">int</span> r=l+len<span class="number">-1</span>; <span class="comment">// 区间终点</span></span><br><span class="line">			<span class="comment">// 3) 枚举分割点</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> k=l;k&lt;r;k++) &#123;</span><br><span class="line">				f[l][r]=min(f[l][r],f[l][k]+f[k+<span class="number">1</span>][r]+s[r]-s[l<span class="number">-1</span>]);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;f[<span class="number">1</span>][n]&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="2-环形石子合并">2. 环形石子合并</span></h2><blockquote>
+<p>题目链接：<a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1880">P1880 [NOI1995] 石子合并 - 洛谷 </a>，推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1oK4y1j7W3/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E29 区间DP 环形石子合并_bilibili</a></p>
+</blockquote>
+<ul>
+<li><p>和上一题比起来只改变了一个条件，那就是石子是环形摆放的，比如 ${4,\ 5,\ 9,\ 4}$ 队列首尾两个 $4$ 是相邻的，上一题是链式石子合并</p>
+</li>
+<li><p>基础思路：我们可以在环形石子中定义一个缺口，如按照下图的模式划分，则会将环形石子变成一个链式石子，就可以用上一个模板，我们额外添加一层循环来枚举这个缺口，当有 $n$ 个石子的时候可以枚举的缺口数是 $n$ 个，再从每种方案中枚举求到最大值，这样能做，但是时间复杂度上升为 $O(n^4)$，显然会 $TLE$</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240426095023268.png" alt="image-20240426095023268"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1) 枚举缺口</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">    <span class="comment">// 2) 枚举区间长度</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> len=<span class="number">2</span>;len&lt;=n;len++) &#123;</span><br><span class="line">		<span class="comment">// 3) 枚举区间起点</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> l=<span class="number">1</span>;l+len<span class="number">-1</span>&lt;=n;l++) &#123;</span><br><span class="line">			<span class="type">int</span> r=l+len<span class="number">-1</span>; <span class="comment">// 区间终点</span></span><br><span class="line">			<span class="comment">// 4) 枚举分割点</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> k=l;k&lt;r;k++) &#123;</span><br><span class="line">				f[l][r]=min(f[l][r],f[l][k]+f[k+<span class="number">1</span>][r]+s[r]-s[l<span class="number">-1</span>]);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>所以不妨换一个做法，如果我们把数组复制一份使长度变为 $2n$，就可以在不改变时间复杂度的情况下模拟得到相同的效果，将 ${4,\ 5,\ 9,\ 4}$ 复制为 ${4,\ 5,\ 9,\ 4,\ 4,\ 5,\ 9,\ 4}$，区间长度依然从 $2$ 枚举到 $4$，区间左端点从 $1$ 到 $4$，即可得到长链 ${4,\ 5,\ 9,\ 4}$、${5,\ 9,\ 4,\ 4}$、${9,\ 4,\ 4,\ 5}$、${4,\ 4,\ 5,\ 9}$，限制右端点 $l+len-1&lt;&#x3D;2n$，即可在上一个模板中仅改变区间左端点的枚举范围解出环形石子 $DP$ 问题的答案</li>
+<li>注意最大值需要从 $f[1][n],\ f[2][n+1],\ …\ ,f[n][2×n-1]$ 中枚举打擂得到，因为有这么多条链</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"><span class="comment">// 环形→链型</span></span><br><span class="line"><span class="comment">// 对于环形,我们从任意一个石子后对其切割得到链型,此时就能用链式区间DP,不过枚举缺口需要O(n),总时间复杂度是O(n^4)</span></span><br><span class="line"><span class="comment">// 所以将链型再复制一份,比如 1 4 2 5 3 变成 1 4 2 5 3 1 4 2 5 3, </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">2</span>*(<span class="number">2e2</span>+<span class="number">10</span>);</span><br><span class="line"><span class="type">int</span> a[N]; <span class="comment">// 每堆石子数量</span></span><br><span class="line"><span class="type">int</span> s[N]; <span class="comment">// 前缀和数组</span></span><br><span class="line"><span class="type">int</span> f[N][N]; <span class="comment">// 环形石子DP最小值</span></span><br><span class="line"><span class="type">int</span> g[N][N]; <span class="comment">// 环形石子DP最大值</span></span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="built_in">cin</span>&gt;&gt;a[i];</span><br><span class="line">		<span class="comment">// 复制一边区间</span></span><br><span class="line">		a[i+n]=a[i];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">memset</span>(f,<span class="number">0x3f</span>,<span class="keyword">sizeof</span> f); <span class="comment">// 找最大</span></span><br><span class="line">	<span class="built_in">memset</span>(g,<span class="number">-0x3f</span>,<span class="keyword">sizeof</span> g); <span class="comment">// 找最小</span></span><br><span class="line">	<span class="comment">// 预处理</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=<span class="number">2</span>*n;i++) &#123;</span><br><span class="line">		s[i]=s[i<span class="number">-1</span>]+a[i];</span><br><span class="line">		g[i][i]=<span class="number">0</span>,f[i][i]=<span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 状态计算(除了区间左端点,其他都不变)</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> len=<span class="number">2</span>;len&lt;=n;len++) &#123;</span><br><span class="line">		<span class="comment">// 区间起点枚举范围扩展到2n</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> l=<span class="number">1</span>;l+len<span class="number">-1</span>&lt;=<span class="number">2</span>*n;l++) &#123;</span><br><span class="line">			<span class="type">int</span> r=l+len<span class="number">-1</span>;</span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> k=l;k&lt;r;k++) &#123;</span><br><span class="line">				f[l][r]=min(f[l][r],f[l][k]+f[k+<span class="number">1</span>][r]+s[r]-s[l<span class="number">-1</span>]);</span><br><span class="line">				g[l][r]=max(g[l][r],g[l][k]+g[k+<span class="number">1</span>][r]+s[r]-s[l<span class="number">-1</span>]);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 目标输出</span></span><br><span class="line">	<span class="type">int</span> minv=INT_MAX,maxv=INT_MIN;</span><br><span class="line">	<span class="comment">// 必须枚举每一种状态,直接输出f[1][n]的不是最大值因为不连续</span></span><br><span class="line">	<span class="comment">// 计算的时候是 f[1][n],f[2][n+1],...,f[n][2*n-1]这样来算的</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		minv=min(minv,f[i][i+n<span class="number">-1</span>]); <span class="comment">// f[1,n],f[2,n+1],...,f[n,2*n-1]</span></span><br><span class="line">		maxv=max(maxv,g[i][i+n<span class="number">-1</span>]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;minv&lt;&lt;<span class="built_in">endl</span>&lt;&lt;maxv&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="3-能量项链">3. 能量项链</span></h2><blockquote>
+<p>题目链接：<a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1063">P1063 [NOIP2006 提高组] 能量项链 - 洛谷 </a>，推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV19t4y1a7xF/?spm_id_from=333.999.0.0">E30 区间DP 能量项链_bilibili</a></p>
+</blockquote>
+<ul>
+<li>题目非常长，从样例入手，$4$ 颗珠子中，前一颗珠子的尾标记是下一颗石子的头标记，现在给出 $4$ 颗珠子的头标记为 ${2,\ 3,\ 5,\ 10}$，实则告诉我们 $4$ 颗珠子为 $(2,3),(3,5),(5,10),(10,2)$，要合并两颗珠子的代价类似于线代中的矩阵乘法，如合并 $1,2$ 两颗珠子释放的能量就是 $2×3×5&#x3D;30$，现在题目要让我们找一种释放能量最大的方法，那么就和环形石子 $DP$ 是相当类似的</li>
+<li>不过要用环形石子 $DP$ 模板之前我们还要讨论一下区间长度、区间左端点、分割点是否还相同？</li>
+<li>$n$ 颗珠子只需要合并 $n-1$ 次就能得到最终的一颗珠子，比如 $2×3×5$ 合并 $1,2$ 颗珠子后得到珠子 $(2,5),(5,10),(10,2)$ 此时释放的能量是 $30$，继续合并得到 $(2,10),(10,2)$ 此时释放的总能量是 $2×5×10+30&#x3D;130$，继续合并得到 $(2,2)$ 此时释放总能量是 $2×10×2+130&#x3D;170$，我们会发现 $2$ 这个数字在运算中用到了两次，所以我们区间 $DP$ 的数字是  ${2,\ 3,\ 5,\ 10,\ 2}$，即区间长度是 $n+1$</li>
+<li>我们仍然对数组进行一次复制，左端点区间枚举范围是 $for(int\ l&#x3D;1;l+len-1&lt;&#x3D;2×n;l++)$，$dp$ 数组 $f[l][r]$ 的状态转移方程是 $f[l][k]+f[k][r]+a[i]×a[k]×a[r]$，即先将 $[l,k]$ 的珠子合并，再把 $[k,r]$ 的珠子合并，最后将 $[l,r]$ 合并，为什么不是 $f[k+1][r]$ 呢？因为计算乘法的时候 $k$ 这个数字会被用到两次</li>
+<li>同样的最后枚举得到最终结果，可以说这道题就是环形石子 $DP$ 的变形</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: 聚会后释放的能量数有点像矩阵乘法,类似环形石子DP</span></span><br><span class="line"><span class="comment">// 若有 2 3 5 10,则有四颗珠子为(2,3),(3,5),(5,10),(10,2)</span></span><br><span class="line"><span class="comment">// 相邻两颗珠子合并后释放能量 2*3*5,并合并为(2,5),同样的复制为 2 3 5 10 2 3 5 10</span></span><br><span class="line"><span class="comment">// 模拟一下可知需要合并n+1次,所以len最大为n+1,右端点最多枚举到2*n,l&lt;k&lt;r</span></span><br><span class="line"><span class="comment">// k=2,表明珠子1~珠子2先合并,珠子3~珠子n先合并,最后合并这两个大珠子,用分治的思想来理解</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">2</span>*(<span class="number">2e2</span>+<span class="number">5</span>);</span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"><span class="type">int</span> a[N]; <span class="comment">// a[i]:第i颗珠子的头标记,第i-1颗珠子的尾标记(i&gt;=2)</span></span><br><span class="line"><span class="type">int</span> f[N][N]; <span class="comment">// f[l,r]:合并[l,r]得到的能量最大值</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="built_in">cin</span>&gt;&gt;a[i];</span><br><span class="line">		a[i+n]=a[i]; <span class="comment">// 环形石子DP复制一份</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 状态计算,注意len为n+1,模拟一遍就知道了</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> len=<span class="number">3</span>;len&lt;=n+<span class="number">1</span>;len++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> l=<span class="number">1</span>;l+len<span class="number">-1</span>&lt;=<span class="number">2</span>*n;l++) &#123;</span><br><span class="line">			<span class="type">int</span> r=l+len<span class="number">-1</span>;</span><br><span class="line">			<span class="comment">// 中间的数字会被用到两次,所以这里是f[l][k]和f[k][r]</span></span><br><span class="line">			<span class="comment">// 这道题里和自己合并是非法的</span></span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> k=l+<span class="number">1</span>;k&lt;r;k++) &#123;</span><br><span class="line">				f[l][r]=max(f[l][r],f[l][k]+f[k][r]+a[l]*a[k]*a[r]); <span class="comment">// 合并代价i,j,k</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 枚举找最大值</span></span><br><span class="line">	<span class="type">int</span> res=INT_MIN;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		res=max(res,f[i][i+n]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;res&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">输入：</span></span><br><span class="line"><span class="comment">4</span></span><br><span class="line"><span class="comment">2 3 5 10</span></span><br><span class="line"><span class="comment">输出：</span></span><br><span class="line"><span class="comment">710</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="4-凸多边形的最优三角形划分">4. 凸多边形的最优三角形划分</span></h2><ul>
+<li>用两个不相邻的顶点之间组成的弦可以把一个凸多边形划分成两个多边形</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240426142014884.png" alt="image-20240426142014884"></p>
+<ul>
+<li>用多条弦就可以把一个凸多边形划分为互不相交的三角形，那么把多边形分割为互不相交的三角形的弦的集合，就叫做凸多边形的三角剖分</li>
+<li>每一组弦的集合会把凸多边形切割成不同的三角形，这些三角形的周长之和就是我们的代价，那么能使这个代价最小的一组弦的集合，就是凸多边形的最优三角形划分</li>
+<li>我们可以推导一下代价的计算公式，对于下面的两幅图，很容易看出，各个三角形的周长之和，其实就是每条 $蓝色的弦的长度 \ ×2 \ + 凸多边形的周长$</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240426142114525.png" alt="image-20240426142114525"></p>
+<ul>
+<li>初始化：因为最少三个点才能组成三角形，$len&#x3D;3$ 时就是最底层最初始的状态，$f[1][3],k&#x3D;2$ 实则就为顶点 $v1,v2,v3$ 构成的三角形的周长，当然这一步不用特地初始化，可以在区间 $DP$ 时直接计算作为底层状态了，真正的初始化是把 $len&#x3D;1\ || \ len&#x3D;2$ 时的各个状态下的 $f$ 定义为 $0$，因为此时根本无法构成三角形，所以第一层枚举区间长度的时候直接从 $len&#x3D;3$ 开始</li>
+<li>这个问题其实和分治法很类似，可以从最外层 $f[1][6]$ 来看，找到合适的分割点 $k&#x3D;4$ 可以切割为 $f[1][4]$ 和 $[5][6]$，后者无法构成三角形在最初初始化的时候已然为 $0$，对于前者 $f[1][4]$ 在之前 $len&#x3D;4$ 的时候已然被计算过了，他也有最佳切割点 $k&#x3D;3$，那么又可以切割为 $f[1][3]$ 和 $f[3][4]$ 以此类推，<strong>所以我们可以把区间 $DP$ 理解为分治法 $+$ 递推</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span> </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路:</span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e3</span>+<span class="number">5</span>; <span class="comment">// 最大顶点数</span></span><br><span class="line"><span class="comment">// 状态表示</span></span><br><span class="line"><span class="type">int</span> f[N][N]; <span class="comment">// f[i][j]:从顶点vi~vj构成的多边形的最优三角剖分的最小值</span></span><br><span class="line"><span class="type">int</span> s[N][N]; <span class="comment">// s[i][j]:满足f[i][j]最小的分割点k的值,即方案</span></span><br><span class="line"><span class="type">int</span> g[N][N]; <span class="comment">// g[i][j]:邻接矩阵,记录vi到vj的距离</span></span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 返回 vx,vy,vz 三个点构成的三角形的边长</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">get_val</span><span class="params">(<span class="type">int</span> x,<span class="type">int</span> y,<span class="type">int</span> z)</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> g[x][y]+g[x][z]+g[y][z];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="type">int</span>&gt; v; <span class="comment">// 保存点集</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 回溯求解出划分点集</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">backtrack</span><span class="params">(<span class="type">int</span> l,<span class="type">int</span> r)</span> &#123;</span><br><span class="line">	<span class="type">int</span> k=s[l][r]; <span class="comment">// 这一步的切割点</span></span><br><span class="line">	<span class="keyword">if</span>(k==<span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line">	<span class="keyword">if</span>(l==r) <span class="keyword">return</span>;</span><br><span class="line">	<span class="comment">// 若k=0了说明走到边界了</span></span><br><span class="line">	<span class="comment">// k&gt;l+1为了只输出弦</span></span><br><span class="line">	<span class="keyword">if</span>(k&gt;l+<span class="number">1</span>) &#123;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;l&lt;&lt;<span class="string">&#x27; &#x27;</span>&lt;&lt;k&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	&#125; </span><br><span class="line">	<span class="comment">// k+1&lt;r是为了只输出弦</span></span><br><span class="line">	<span class="keyword">if</span>(k+<span class="number">1</span>&lt;r) &#123;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;k&lt;&lt;<span class="string">&#x27; &#x27;</span>&lt;&lt;r&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	backtrack(l,k);</span><br><span class="line">	backtrack(k+<span class="number">1</span>,r);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="comment">// 输入邻接矩阵</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=n;j++) &#123;</span><br><span class="line">			<span class="built_in">cin</span>&gt;&gt;g[i][j];</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 初始化</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		f[i][i]=<span class="number">0</span>;</span><br><span class="line"><span class="comment">//		f[i-1][i]=0;</span></span><br><span class="line">		s[i][i]=<span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 两个点的情况</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n<span class="number">-1</span>;i++) &#123;</span><br><span class="line">		f[i][i+<span class="number">1</span>]=<span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	f[<span class="number">1</span>][n]=<span class="number">0</span>;</span><br><span class="line">	<span class="comment">// 区间dp</span></span><br><span class="line">	<span class="comment">// 1) 第一层枚举区间长度</span></span><br><span class="line"><span class="comment">//	int ans=INT_MAX; // 记录最终结果,最小的边权和</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> len=<span class="number">3</span>;len&lt;=n;len++) &#123;</span><br><span class="line">		<span class="comment">// 2) 枚举左端点</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> l=<span class="number">1</span>;l+len<span class="number">-1</span>&lt;=n;l++) &#123;</span><br><span class="line">			<span class="type">int</span> r=l+len<span class="number">-1</span>; <span class="comment">// 区间长度和左端点决定右端点</span></span><br><span class="line">			<span class="comment">// 3) 枚举分割点</span></span><br><span class="line">			f[l][r]=INT_MAX; <span class="comment">// 这里设置为最大值,一旦找到更小值就可以对其进行替换</span></span><br><span class="line">			s[l][r]=l+<span class="number">1</span>;</span><br><span class="line">			<span class="keyword">for</span>(<span class="type">int</span> k=l+<span class="number">1</span>;k&lt;r;k++) &#123;</span><br><span class="line">				<span class="comment">// 区间dp第三步,</span></span><br><span class="line">				<span class="type">int</span> tmp=f[l][k]+f[k][r]+get_val(l,k,r);</span><br><span class="line">				<span class="keyword">if</span>(tmp&lt;f[l][r]) &#123;</span><br><span class="line">					f[l][r]=tmp; <span class="comment">// 更新为最小值</span></span><br><span class="line">					s[l][r]=k; <span class="comment">// 记录方案</span></span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;f[<span class="number">1</span>][n]&lt;&lt;<span class="built_in">endl</span>; <span class="comment">// 从1~n中选出 v1,vn,以及一个点vk,此时最小的权值和</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 最后选出点的集合是 v1, v4, v6, v3</span></span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;g[<span class="number">1</span>][<span class="number">4</span>]&lt;&lt;<span class="string">&#x27; &#x27;</span>&lt;&lt;g[<span class="number">4</span>][<span class="number">6</span>]&lt;&lt;<span class="string">&#x27; &#x27;</span>&lt;&lt;g[<span class="number">1</span>][<span class="number">3</span>]&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;(g[<span class="number">1</span>][<span class="number">4</span>]+g[<span class="number">4</span>][<span class="number">6</span>]+g[<span class="number">1</span>][<span class="number">3</span>])*<span class="number">2</span>+g[<span class="number">1</span>][<span class="number">2</span>]+g[<span class="number">1</span>][<span class="number">6</span>]+g[<span class="number">2</span>][<span class="number">3</span>]+g[<span class="number">3</span>][<span class="number">4</span>]+g[<span class="number">4</span>][<span class="number">5</span>]+g[<span class="number">5</span>][<span class="number">6</span>]&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;f[<span class="number">1</span>][<span class="number">4</span>]+f[<span class="number">4</span>][<span class="number">6</span>]+get_val(<span class="number">1</span>,<span class="number">4</span>,<span class="number">6</span>)&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 输出f数组</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=n;j++) &#123;</span><br><span class="line">			<span class="built_in">cout</span>&lt;&lt;f[i][j]&lt;&lt;<span class="string">&#x27; &#x27;</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="comment">// 输出s策略数组</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		<span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=n;j++) &#123;</span><br><span class="line">			<span class="built_in">cout</span>&lt;&lt;s[i][j]&lt;&lt;<span class="string">&#x27; &#x27;</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	backtrack(<span class="number">1</span>,n); <span class="comment">// 找切割点集</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">auto</span> x:v) &#123;</span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;x&lt;&lt;<span class="string">&#x27; &#x27;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">输入：</span></span><br><span class="line"><span class="comment">6</span></span><br><span class="line"><span class="comment">0 2 3 1 5 6</span></span><br><span class="line"><span class="comment">2 0 3 4 8 6</span></span><br><span class="line"><span class="comment">3 3 0 10 13 7</span></span><br><span class="line"><span class="comment">1 4 10 0 12 5</span></span><br><span class="line"><span class="comment">5 8 13 12 0 3</span></span><br><span class="line"><span class="comment">6 6 7 5 3 0</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2024/11/07/%E5%8C%BA%E9%97%B4DP/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" rel="tag">动态规划</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8C%BA%E9%97%B4DP/" rel="tag">区间DP</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E7%AB%9E%E8%B5%9B/" rel="tag">算法竞赛</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2024/11/07/%E6%A0%91%E5%BD%A2DP/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            树形DP
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2024/11/07/%E7%BA%BF%E6%80%A7DP/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">线性DP</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.staticfile.org/valine/1.4.16/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "92B90kPxtBbndNGuCdYouFEO-gzGzoHsz",
+    app_key: "GnHcvbn2eo3Vvqi6x4X90ogH",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2024
+        <i class="ri-heart-fill heart_icon"></i> John Doe
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-sea-side.svg" alt="漂至"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2106426315&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<!-- hexo injector body_end start --><script data-pjax src="https://unpkg.com/oh-my-live2d"></script><script>const oml2d = OML2D.loadOml2d({dockedPosition:"left",mobileDisplay:true,models:[{"path":"https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json","scale":0.12,"position":[0,0],"stageStyle":{"width":250},"mobileScale":0.08,"mobilePosition":[0,0],"mobileStageStyle":{"width":180}}],parentElement:document.body,primaryColor:"var(--btn-bg)",sayHello:false,tips:{style: {"width":230,"height":120,"left":"calc(50% - 20px)","top":"-100px"},mobileStyle: {"width":180,"height":80,"left":"calc(50% - 30px)","top":"-100px"},idleTips:{interval:15000,message:function(){
+  return axios.get('https://v1.hitokoto.cn?c=i')
+    .then(function (response) {
+      return response.data.hitokoto ;
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+}}});</script><!-- hexo injector body_end end --></body>
+
+</html>

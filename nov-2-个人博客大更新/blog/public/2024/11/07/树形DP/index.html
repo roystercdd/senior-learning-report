@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+       
+      <meta name="keywords" content="生活,思考,代码,博客,摄影" />
+       
+      <meta name="description" content="欢迎光临CDD的个人网站~~~" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>树形DP |  漂至</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/deadpool.ico" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="漂至" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-树形DP"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  树形DP
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2024/11/07/%E6%A0%91%E5%BD%A2DP/" class="article-date">
+  <time datetime="2024-11-07T14:00:09.000Z" itemprop="datePublished">2024-11-07</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">3.5k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">15 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <meta name="referrer" content="no-referrer">
+
+<h1><span id="树形dp">树形DP</span></h1><!-- toc -->
+
+<ul>
+<li><a href="#1-%E6%A0%91%E7%9A%84%E9%87%8D%E5%BF%83">1. 树的重心</a></li>
+<li><a href="#2-%E6%A0%91%E7%9A%84%E7%9B%B4%E5%BE%84">2. 树的直径</a></li>
+<li><a href="#3-%E6%A0%91%E7%9A%84%E4%B8%AD%E5%BF%83">3. 树的中心</a><ul>
+<li><a href="#31-%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%B7%B1%E6%90%9C-dfs_ddown">3.1. 第一次深搜 dfs_d（down）</a></li>
+<li><a href="#32-%E7%AC%AC%E4%BA%8C%E6%AC%A1%E6%B7%B1%E6%90%9C-dfs_uup">3.2. 第二次深搜 dfs_u（up）</a></li>
+</ul>
+</li>
+<li><a href="#4-%E4%BE%8B%E9%A2%98">4. 例题</a><ul>
+<li><a href="#41-%E6%B2%A1%E6%9C%89%E4%B8%8A%E5%8F%B8%E7%9A%84%E8%88%9E%E4%BC%9A">4.1. 没有上司的舞会</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+
+<span id="more"></span>
+
+
+
+<h2><span id="1-树的重心">1. 树的重心</span></h2><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV14K4y1f7Uf/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E32 树形DP 树的重心_bilibili</a>，模拟过程从 $10:00$ 起</p>
+</blockquote>
+<ul>
+<li>重心定义：指树中的一个结点，将这个点删除后剩余各个连通块中点数的最大值最小，那么这个结点就是树的重心</li>
+<li>思路，任取一点 $u$，若以 $u$ 为重心，则分为两类<ul>
+<li>一类是 $u$ 的子树，需要计算出 $u$ 的最大子树的节点数 $size$ 和以 $u$ 为根的子树的结点数 $sum$</li>
+<li>另一类是 $u$ 上面的部分，直接通过 $n-sum$ 得到</li>
+</ul>
+</li>
+<li>下面的子树部分在深搜回溯时完成，上方部分用做差的方法来计算，在深搜每个结点时，不断取每个结点 $size$ 和 $n-sum$ 中的最大值来更新结果</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240415212508027.png" alt="image-20240415212508027"></p>
+<ul>
+<li>如上图中将结点 $6$ 作为树的重心，那么其左子树 ${7,\ 8,\ 9}$ 的结点个数为 $3$，其右子树 ${3}$ 结点个数为 $1$，则 $sum$ 为 $1+3+1(自身)&#x3D;5$，其上方部分为 ${1,\ 2,\ 4,\ 5}$ 结点个数为 $4$，$ans&#x3D;min(max(1,3),9-sum)&#x3D;4$</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line">		</span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line">		</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line">		</span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line">		</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">int</span> n,ans; <span class="comment">// ans记录答案,也就是剩余各个连通块中点数的最大值</span></span><br><span class="line"><span class="type">bool</span> vis[N]; <span class="comment">// 避免重复搜索,只能自上往下</span></span><br><span class="line"><span class="type">int</span> h[N],e[<span class="number">2</span>*N],ne[<span class="number">2</span>*N],idx; <span class="comment">// 链式前向星邻接表</span></span><br><span class="line">		</span><br><span class="line"><span class="type">void</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b)</span> &#123;</span><br><span class="line">	e[idx]=b;</span><br><span class="line">	ne[idx]=h[a];</span><br><span class="line">	h[a]=idx++;</span><br><span class="line">&#125;</span><br><span class="line">		</span><br><span class="line"><span class="comment">// 以u为根的子树的节点数</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">dfs</span><span class="params">(<span class="type">int</span> u)</span> &#123;</span><br><span class="line">	vis[u]=<span class="literal">true</span>;</span><br><span class="line">	<span class="type">int</span> size=<span class="number">0</span>; <span class="comment">// 记录u的最大子树的结点数</span></span><br><span class="line">	<span class="type">int</span> sum=<span class="number">1</span>; <span class="comment">// 记录以u为根的子树的结点数</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=h[u];i!=<span class="number">-1</span>;i=ne[i]) &#123;</span><br><span class="line">		<span class="type">int</span> j=e[i]; <span class="comment">// 取邻点</span></span><br><span class="line">		<span class="keyword">if</span>(vis[j]) <span class="keyword">continue</span>; <span class="comment">// 因为是无向图建边,避免往回走陷入死循环</span></span><br><span class="line">		<span class="type">int</span> s=dfs(j); <span class="comment">// s是以j为根的子树的结点数</span></span><br><span class="line">		<span class="comment">// 入下回离,回时更新维护size和sum</span></span><br><span class="line">		size=max(size,s); <span class="comment">// 最大子树的结点数</span></span><br><span class="line">		sum+=s; <span class="comment">// 子树的结点总数</span></span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;u=&quot;</span>&lt;&lt;u&lt;&lt;<span class="string">&quot;, size=&quot;</span>&lt;&lt;size&lt;&lt;<span class="string">&quot;, sum=&quot;</span>&lt;&lt;sum&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 当所有临边访问完后,也就是&quot;离&quot;开u结点的时候,更新答案</span></span><br><span class="line">	ans=min(ans,max(size,n-sum)); <span class="comment">// 最小最大值</span></span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;u=&quot;</span>&lt;&lt;u&lt;&lt;<span class="string">&quot;, size=&quot;</span>&lt;&lt;size&lt;&lt;<span class="string">&quot;, sum=&quot;</span>&lt;&lt;sum&lt;&lt;<span class="string">&quot;, ans=&quot;</span>&lt;&lt;ans&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> sum; <span class="comment">// 返回以u为根的子树的结点个数</span></span><br><span class="line">&#125;</span><br><span class="line">		</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">memset</span>(h,<span class="number">-1</span>,<span class="keyword">sizeof</span> h);</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	ans=n;</span><br><span class="line">	<span class="comment">// n结点共n-1条边</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;n;i++) &#123;</span><br><span class="line">		<span class="type">int</span> a,b;</span><br><span class="line">		<span class="built_in">cin</span>&gt;&gt;a&gt;&gt;b;</span><br><span class="line">		add(a,b);</span><br><span class="line">		add(b,a);</span><br><span class="line">	&#125;</span><br><span class="line">	dfs(<span class="number">1</span>); <span class="comment">// 从任意结点开始深搜,不影响结果</span></span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;ans&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line">		</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">9</span></span><br><span class="line"><span class="comment">1 4</span></span><br><span class="line"><span class="comment">1 2</span></span><br><span class="line"><span class="comment">2 6</span></span><br><span class="line"><span class="comment">2 5</span></span><br><span class="line"><span class="comment">6 3</span></span><br><span class="line"><span class="comment">6 7</span></span><br><span class="line"><span class="comment">7 9</span></span><br><span class="line"><span class="comment">7 8</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="2-树的直径">2. 树的直径</span></h2><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1ni4y157s3/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E33 树形DP 树的直径_bilibili</a>，模拟过程从 $9:45$ 起</p>
+</blockquote>
+<ul>
+<li>树的直径：即树的最长路径，在一棵树中使得路径两端点之间的距离最远，注意路径中可只包含一个点</li>
+<li>思路，任取一点 $u$，从 $u$ 往下搜，返回时收集边权并记录两条路径<ul>
+<li>$d1$：从 $u$ 往下走的最长路径的长度</li>
+<li>$d2$：从 $u$ 往下走的次长路径的长度</li>
+<li>那么 $d1+d2$ 代表的就是悬挂在结点 $u$ 上的最长路径的长度，用一个临时变量 $ans$ 维护最大路径长度即可，$ans&#x3D;max(ans,d1+d2)$</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240415224030562.png" alt="image-20240415224030562"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e4</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> M=<span class="number">2</span>*N;</span><br><span class="line"><span class="type">int</span> n,ans; <span class="comment">// ans记录最长路径的长度</span></span><br><span class="line"><span class="type">bool</span> vis[N]; <span class="comment">// 避免往下走</span></span><br><span class="line"><span class="type">int</span> h[N],e[M],ne[M],w[M],idx;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b,<span class="type">int</span> c)</span> &#123;</span><br><span class="line">	e[idx]=b;</span><br><span class="line">	ne[idx]=h[a];</span><br><span class="line">	w[idx]=c;</span><br><span class="line">	h[a]=idx++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 返回从u点往下走的最大长度</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">dfs</span><span class="params">(<span class="type">int</span> u)</span> &#123;</span><br><span class="line">	vis[u]=<span class="literal">true</span>;</span><br><span class="line">	<span class="type">int</span> d1=<span class="number">0</span>; <span class="comment">// 从u往下走的最大长度</span></span><br><span class="line">	<span class="type">int</span> d2=<span class="number">0</span>; <span class="comment">// 从u往下走的次大长度</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=h[u];i!=<span class="number">-1</span>;i=ne[i]) &#123;</span><br><span class="line">		<span class="type">int</span> j=e[i]; <span class="comment">// 取出邻接点</span></span><br><span class="line">		<span class="keyword">if</span>(vis[j]) <span class="keyword">continue</span>; <span class="comment">// 无向图双向建边,只能从上往下避免往回走</span></span><br><span class="line">		<span class="type">int</span> d=dfs(j)+w[i]; <span class="comment">// 从u经j点向下走的最大长度</span></span><br><span class="line">		<span class="comment">// 如果d比最大长度还大,那么d变最大,最大变次大</span></span><br><span class="line">		<span class="keyword">if</span>(d&gt;=d1) d2=d1,d1=d;</span><br><span class="line">		<span class="comment">// 如果d比次大大,那么d变次大</span></span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span>(d&gt;d2) d2=d;</span><br><span class="line">		<span class="comment">// 回的时候更新u的最大边和次大边</span></span><br><span class="line">		<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;u=&quot;</span>&lt;&lt;u&lt;&lt;<span class="string">&quot;, d1=&quot;</span>&lt;&lt;d1&lt;&lt;<span class="string">&quot;, d2=&quot;</span>&lt;&lt;d2&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 入下回离,离的时候更新答案</span></span><br><span class="line">	ans=max(ans,d1+d2);</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;<span class="string">&quot;u=&quot;</span>&lt;&lt;u&lt;&lt;<span class="string">&quot;, d1=&quot;</span>&lt;&lt;d1&lt;&lt;<span class="string">&quot;, d2=&quot;</span>&lt;&lt;d2&lt;&lt;<span class="string">&quot;, ans=&quot;</span>&lt;&lt;ans&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> d1; <span class="comment">// 返回从u往下走的最大长度,先有最大边,再遍历其他边,从而找新最大和次大</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">memset</span>(h,<span class="number">-1</span>,<span class="keyword">sizeof</span> h);</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="comment">// n点 n-1边</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;n;i++) &#123;</span><br><span class="line">		<span class="type">int</span> a,b,c;</span><br><span class="line">		<span class="built_in">cin</span>&gt;&gt;a&gt;&gt;b&gt;&gt;c;</span><br><span class="line">		add(a,b,c);</span><br><span class="line">		add(b,a,c);</span><br><span class="line">	&#125;</span><br><span class="line">	dfs(<span class="number">1</span>); <span class="comment">// 任选一点开始深搜结果相等</span></span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;ans&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">6</span></span><br><span class="line"><span class="comment">5 1 6</span></span><br><span class="line"><span class="comment">1 4 5</span></span><br><span class="line"><span class="comment">6 3 9</span></span><br><span class="line"><span class="comment">2 6 8</span></span><br><span class="line"><span class="comment">6 1 7</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="3-树的中心">3. 树的中心</span></h2><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1FT4y1M7R6/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E34 树形DP 树的中心_bilibili</a>，模拟过程从 $14:20$ 起</p>
+</blockquote>
+<ul>
+<li><p>树的中心：到树中其他点的最远距离最近</p>
+</li>
+<li><p>思路，若以每个点为根，分别求出从根向下走的最远距离，然后循环 $n$ 个点，求出各点最远距离的最小值，这样相当于 $n$ 遍 $dfs$，时间复杂度 $O(n^2)$ 会超时，该思路可以由两遍 $dfs$ 代替</p>
+</li>
+<li><p>从 $u$ 到其他结点的最远距离可以分为两类</p>
+<ul>
+<li>从 $u$ 点向下走的最远距离，用 $d1[u]$ 表示，自下而上递推，由子结点信息更新父结点信息，在返回时实现，属于入下回离中的回，即在 $dfs$ 之后实现<ul>
+<li>从 $u$ 向下走的最大长度：$d1[u]&#x3D;d1[j]&#x3D;w[i]$</li>
+<li>从 $u$ 向下走的次长长度：$d2[u]&#x3D;d2[j]+w[i]$</li>
+</ul>
+</li>
+<li>从 $u$ 点向上走的最远距离，用 $up[u]$ 表示，自上而下递推，由父结点信息更新子结点信息，在下行时实现，属于入下回离中的下，即在 $dfs$ 之前实现<ul>
+<li>如果 $j$ 在从 $u$ 向下走的最长路径上，$up[j]&#x3D;w[i]+max(up[u],d2[u])$，即当前边权 $+$ 次长边</li>
+<li>如果 $j$ 不在从 $u$ 向下走的最长路径上，$up[j]&#x3D;w[i]+max(up[u],d1[u])$，即当前边权 $+$ 最长边</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3><span id="31-第一次深搜-dfs_ddown">3.1. 第一次深搜 dfs_d（down）</span></h3><ul>
+<li>子结点更新父结点，向上传递，故“回” 时传递信息</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 第一遍dfs</span></span><br><span class="line"><span class="comment">// 维护u向下走的最远距离d1[u]和次大距离d2[u]</span></span><br><span class="line"><span class="comment">// 维护从u向下走的最长路径是从哪个点下去的,即可在第二遍dfs中判断结点是否在最长路径上</span></span><br><span class="line"><span class="comment">// u:当前访问结点,fa:父结点,代替vis数组避免往回走的情况,其实就是树的直径升级版</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">dfs_d</span><span class="params">(<span class="type">int</span> u,<span class="type">int</span> fa)</span> &#123;</span><br><span class="line">	<span class="comment">// 最长与次长初始化为0</span></span><br><span class="line">	d1[u]=<span class="number">0</span>;</span><br><span class="line">	d2[u]=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=h[u];i!=<span class="number">-1</span>;i=ne[i]) &#123;</span><br><span class="line">		<span class="type">int</span> j=e[i]; <span class="comment">// 取出邻接点</span></span><br><span class="line">		<span class="keyword">if</span>(j==fa) <span class="keyword">continue</span>; <span class="comment">// 避免向上查找</span></span><br><span class="line">		<span class="type">int</span> d=dfs_d(j,u)+w[i]; <span class="comment">// 从u经j向下走的最长长度+边权</span></span><br><span class="line">        <span class="comment">// 为什么是d&gt;=d1[u]?因为最长长度可能由多条,为了次大和最大长度不相等,每次遍历到≥d1[u]的边时直接覆盖</span></span><br><span class="line">		<span class="keyword">if</span>(d&gt;=d1[u]) d2[u]=d1[u],d1[u]=d,p1[u]=j; <span class="comment">// 最长路径是从j下去的</span></span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span>(d&gt;d2[u]) d2[u]=d;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 离开结点时输出每个结点向下走的最大长度和次大长度</span></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;u=%d, d1[%d]=%d, d2[%d]=%d\n&quot;</span>,u,u,d1[u],u,d2[u]);</span><br><span class="line">	<span class="keyword">return</span> d1[u]; <span class="comment">// 返回向下走的最长长度</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3><span id="32-第二次深搜-dfs_uup">3.2. 第二次深搜 dfs_u（up）</span></h3><ul>
+<li>父结点更新子结点，向下传递，故“下”时传递信息</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 维护每个结点向上走的最大长度</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">dfs_u</span><span class="params">(<span class="type">int</span> u,<span class="type">int</span> fa)</span> &#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=h[u];i!=<span class="number">-1</span>;i=ne[i]) &#123;</span><br><span class="line">		<span class="type">int</span> j=e[i];</span><br><span class="line">		<span class="keyword">if</span>(j==fa) <span class="keyword">continue</span>;</span><br><span class="line">		<span class="comment">// 如果j在u往下走的最大路径上,用次大边更新</span></span><br><span class="line">		<span class="keyword">if</span>(p1[u]==j) up[j]=max(up[u],d2[u])+w[i];</span><br><span class="line">		<span class="comment">// 下行传递信息</span></span><br><span class="line">		<span class="comment">// 如果j不在y往下走的最大路径上,用最大边更新</span></span><br><span class="line">		<span class="keyword">else</span> up[j]=max(up[u],d1[u])+w[i];</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;u=%d, up[%d]=%d, up[%d]=%d\n&quot;</span>,u,j,up[j],u,up[u]);</span><br><span class="line">		dfs_u(j,u); <span class="comment">// 深搜u的子结点j</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240416102410939.png" alt="image-20240416102410939"></p>
+<ul>
+<li><p>如上图树结构在第一次 $dfs$ 结束后得到每个结点向下走的最大长度和次长长度如每个结点下方的第一关键字和第二关键字所示</p>
+</li>
+<li><p>现进行第二次 $dfs$，因为是向下传递，所以我们只看入下回离中的“下”</p>
+<ul>
+<li>先经过结点 $5$，由于 $5$ 不在其父结点 $1$ 的最长路径上，所以 $up[5]&#x3D;d1[1]+w[i]&#x3D;3+1&#x3D;4$（$1$ 向下走的最长长度 $+$ 边权）</li>
+<li>再经过结点 $2$，由于 $2$ 在父结点 $1$ 的最长路径上，所以 $up[2]&#x3D;d2[1]+w[i]&#x3D;1+1&#x3D;2$（$1$ 向下走的次大长度 $+$ 边权）</li>
+<li>再经过结点 $3$，由于 $3$ 在父结点 $2$ 的最长路径上，所以 $up[3]&#x3D;max(up[2],d2[2])+w[i]&#x3D;max(2,0)+1&#x3D;3$（父结点 $2$ 向上走的最大距离或者向下走的次大距离中的最大值，即 ${2→\ 1→\ 5}$ 这条路 $+$ ${2→3}$的边权）</li>
+<li>最后经过结点 $4$，由于 $4$ 在父结点 $3$ 的最长路径上，所以 $up[4]&#x3D;max(up[3],d2[3])+w[i]&#x3D;max(3,0)+1&#x3D;4$</li>
+</ul>
+</li>
+<li><p>最终输入完整的模拟结果如下：</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240416104618207.png" alt="image-20240416104618207"></p>
+<ul>
+<li>完整代码如下：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> x first</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> y second</span></span><br><span class="line"></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">long</span> ll;</span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">pair</span>&lt;<span class="type">int</span>,<span class="type">int</span>&gt; PII;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解题思路: </span></span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N=<span class="number">1e5</span>+<span class="number">5</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> M=<span class="number">2</span>*N;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 链式前向星</span></span><br><span class="line"><span class="type">int</span> h[N];</span><br><span class="line"><span class="type">int</span> e[M];</span><br><span class="line"><span class="type">int</span> ne[M];</span><br><span class="line"><span class="type">int</span> w[M];</span><br><span class="line"><span class="type">int</span> idx;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b,<span class="type">int</span> c)</span> &#123;</span><br><span class="line">	e[idx]=b;</span><br><span class="line">	ne[idx]=h[a];</span><br><span class="line">	w[idx]=c;</span><br><span class="line">	h[a]=idx++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> d1[N]; <span class="comment">// 存储从u点向下走的最大长度</span></span><br><span class="line"><span class="type">int</span> d2[N]; <span class="comment">// 存储从u点向下走的次大长度</span></span><br><span class="line"><span class="type">int</span> p1[N]; <span class="comment">// 记录从u点向下走的最长路径是从哪个点下去的</span></span><br><span class="line"><span class="type">int</span> up[N]; <span class="comment">// 记录从u点向上走的最大路径长度</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 第一遍dfs</span></span><br><span class="line"><span class="comment">// 维护u向下走的最远距离d1[u]和次大距离d2[u]</span></span><br><span class="line"><span class="comment">// 维护从u向下走的最长路径是从哪个点下去的,即可在第二遍dfs中判断结点是否在最长路径上</span></span><br><span class="line"><span class="comment">// u:当前访问结点,fa:父结点,代替vis数组避免往回走的情况,其实就是树的直径升级版</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">dfs_d</span><span class="params">(<span class="type">int</span> u,<span class="type">int</span> fa)</span> &#123;</span><br><span class="line">	<span class="comment">// 最长与次长初始化为0</span></span><br><span class="line">	d1[u]=<span class="number">0</span>;</span><br><span class="line">	d2[u]=<span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=h[u];i!=<span class="number">-1</span>;i=ne[i]) &#123;</span><br><span class="line">		<span class="type">int</span> j=e[i]; <span class="comment">// 取出邻接点</span></span><br><span class="line">		<span class="keyword">if</span>(j==fa) <span class="keyword">continue</span>; <span class="comment">// 避免向上查找</span></span><br><span class="line">		<span class="type">int</span> d=dfs_d(j,u)+w[i]; <span class="comment">// 从u经j向下走的最长长度+边权</span></span><br><span class="line">		<span class="keyword">if</span>(d&gt;=d1[u]) d2[u]=d1[u],d1[u]=d,p1[u]=j; <span class="comment">// 最长路径是从j下去的</span></span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span>(d&gt;d2[u]) d2[u]=d;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 离开结点时输出每个结点向下走的最大长度和次大长度</span></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;u=%d, d1[%d]=%d, d2[%d]=%d\n&quot;</span>,u,u,d1[u],u,d2[u]);</span><br><span class="line">	<span class="keyword">return</span> d1[u]; <span class="comment">// 返回向下走的最长长度</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 维护每个结点向上走的最大长度</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">dfs_u</span><span class="params">(<span class="type">int</span> u,<span class="type">int</span> fa)</span> &#123;</span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=h[u];i!=<span class="number">-1</span>;i=ne[i]) &#123;</span><br><span class="line">		<span class="type">int</span> j=e[i];</span><br><span class="line">		<span class="keyword">if</span>(j==fa) <span class="keyword">continue</span>;</span><br><span class="line">		<span class="comment">// 如果j在u往下走的最大路径上,用次大边更新</span></span><br><span class="line">		<span class="keyword">if</span>(p1[u]==j) up[j]=max(up[u],d2[u])+w[i];</span><br><span class="line">		<span class="comment">// 下行传递信息</span></span><br><span class="line">		<span class="comment">// 如果j不在y往下走的最大路径上,用最大边更新</span></span><br><span class="line">		<span class="keyword">else</span> up[j]=max(up[u],d1[u])+w[i];</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;u=%d, up[%d]=%d, up[%d]=%d\n&quot;</span>,u,j,up[j],u,up[u]);</span><br><span class="line">		dfs_u(j,u); <span class="comment">// 深搜u的子结点j</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">memset</span>(h,<span class="number">-1</span>,<span class="keyword">sizeof</span> h);</span><br><span class="line">	<span class="built_in">cin</span>&gt;&gt;n;</span><br><span class="line">	<span class="comment">// n顶点 n-1条边</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;n;i++) &#123;</span><br><span class="line">		<span class="type">int</span> a,b,c;</span><br><span class="line">		<span class="built_in">cin</span>&gt;&gt;a&gt;&gt;b&gt;&gt;c;</span><br><span class="line">		add(a,b,c),add(b,a,c);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 深搜入口父结点定义为-1,因为编号为-1的点根本不存在,根节点无父结点,相当于把1作为根节点的意思</span></span><br><span class="line">	dfs_d(<span class="number">1</span>,<span class="number">-1</span>); <span class="comment">// 第一次深搜 </span></span><br><span class="line">	dfs_u(<span class="number">1</span>,<span class="number">-1</span>); <span class="comment">// 第二次深搜</span></span><br><span class="line">	<span class="type">int</span> res=INT_MAX;</span><br><span class="line">	<span class="comment">// 对每个结点</span></span><br><span class="line">	<span class="comment">// (往上走距离的最大值,往下走距离的最大值)的最大值即结点i到树中其他结点的最大距离</span></span><br><span class="line">	<span class="comment">// 对每个结点的最大值取最小值</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++) &#123;</span><br><span class="line">		res=min(res,max(up[i],d1[i]));</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span>&lt;&lt;res&lt;&lt;<span class="built_in">endl</span>; <span class="comment">// 输出到中心到其他结点的最大距离</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">5</span></span><br><span class="line"><span class="comment">2 1 1</span></span><br><span class="line"><span class="comment">3 2 1</span></span><br><span class="line"><span class="comment">4 3 1</span></span><br><span class="line"><span class="comment">5 1 1</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2><span id="4-例题">4. 例题</span></h2><h3><span id="41-没有上司的舞会">4.1. 没有上司的舞会</span></h3><blockquote>
+<p>推荐学习视频：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1eK411N7Ly/?spm_id_from=333.999.0.0&vd_source=b8e5916fcec63c0b6234c190e1ec6dd1">E17 树形DP Luogu P1352 没有上司的舞会 bilibili</a>，模拟过程从 $6:50$ 开始</p>
+</blockquote>
+<ul>
+<li>先从根到叶一路深搜，再从叶到根做后</li>
+<li>序 $DP$，每次用子树的 $f$ 值更新当前结点的 $f$ 值，兜了一圈回到根节点，根节点的 $f$ 值就是全局最优解</li>
+</ul>
+<p><img src="https://gitee.com/RoysterCDD/figurebed/raw/master/img/image-20240421234506971.png" alt="image-20240421234506971"></p>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2024/11/07/%E6%A0%91%E5%BD%A2DP/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" rel="tag">动态规划</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%A0%91%E5%BD%A2DP/" rel="tag">树形DP</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AE%97%E6%B3%95%E7%AB%9E%E8%B5%9B/" rel="tag">算法竞赛</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2024/11/07/%E7%8A%B6%E5%8E%8BDP/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            状压DP
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2024/11/07/%E5%8C%BA%E9%97%B4DP/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">区间DP</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.staticfile.org/valine/1.4.16/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "92B90kPxtBbndNGuCdYouFEO-gzGzoHsz",
+    app_key: "GnHcvbn2eo3Vvqi6x4X90ogH",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+  
+   
+    <script src="https://cdn.staticfile.org/twikoo/1.4.18/twikoo.all.min.js"></script>
+    <div id="twikoo" class="twikoo"></div>
+    <script>
+        twikoo.init({
+            envId: ""
+        })
+    </script>
+ 
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2024
+        <i class="ri-heart-fill heart_icon"></i> John Doe
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-sea-side.svg" alt="漂至"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">相册</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/MathJax.js"></script>
+<script src="https://cdn.staticfile.org/mathjax/2.7.7/config/TeX-AMS-MML_HTMLorMML-full.js"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=2106426315&auto=1&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<!-- hexo injector body_end start --><script data-pjax src="https://unpkg.com/oh-my-live2d"></script><script>const oml2d = OML2D.loadOml2d({dockedPosition:"left",mobileDisplay:true,models:[{"path":"https://unpkg.com/live2d-widget-model-koharu@1.0.5/assets/koharu.model.json","scale":0.12,"position":[0,0],"stageStyle":{"width":250},"mobileScale":0.08,"mobilePosition":[0,0],"mobileStageStyle":{"width":180}}],parentElement:document.body,primaryColor:"var(--btn-bg)",sayHello:false,tips:{style: {"width":230,"height":120,"left":"calc(50% - 20px)","top":"-100px"},mobileStyle: {"width":180,"height":80,"left":"calc(50% - 30px)","top":"-100px"},idleTips:{interval:15000,message:function(){
+  return axios.get('https://v1.hitokoto.cn?c=i')
+    .then(function (response) {
+      return response.data.hitokoto ;
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+}}});</script><!-- hexo injector body_end end --></body>
+
+</html>
